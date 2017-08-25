@@ -1,0 +1,13 @@
+body {
+    font: 13px/1.5 sans-serif;
+}
+
+.logo {
+    float: right;
+    text-decoration: none;
+    display: inline-block;
+    transition: 1s;
+}
+.logo:hover {
+    transform: rotate(-.1turn);
+}

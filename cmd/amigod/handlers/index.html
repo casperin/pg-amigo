@@ -1,0 +1,10 @@
+{{define "body"}}
+<h1>Databases</h1>
+<ul>
+    {{range $_, $db := .databases}}
+    <li>
+        <a href=/db/{{$db}}>{{$db}}</a>
+    </li>
+    {{end}}
+</ul>
+{{end}}
