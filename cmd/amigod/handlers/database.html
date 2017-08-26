@@ -1,3 +1,8 @@
 {{define "body"}}
-<h1>{{.db}}</h1>
+<h1>{{.dbName}}</h1>
+<ul>
+    {{range $_, $t := .tables}}
+    <li>{{$t}}</li>
+    {{end}}
+</ul>
 {{end}}

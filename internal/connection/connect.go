@@ -13,6 +13,7 @@ import (
 var (
 	DB    *sqlx.DB
 	Error error = errors.New("Not yet connected.")
+	Conns       = map[string]*sqlx.DB{}
 )
 
 func init() {
@@ -28,4 +29,31 @@ func Connect() {
 			viper.GetString("pg_password"),
 		),
 	)
+}
+
+// This seems crazy. Don't know pg well enough >_<)
+func connectTo(dbName string) error {
+	db, err := sqlx.Connect(
+		"postgres",
+		fmt.Sprintf(
+			"user=%s password=%s dbname=%s sslmode=disable",
+			viper.GetString("pg_username"),
+			viper.GetString("pg_password"),
+			dbName,
+		),
+	)
+	if err != nil {
+		return err
+	}
+	Conns[dbName] = db
+	return nil
+}
+
+func GetDB(dbName string) (*sqlx.DB, error) {
+	if Conns[dbName] == nil {
+		if err := connectTo(dbName); err != nil {
+			return nil, err
+		}
+	}
+	return Conns[dbName], nil
 }
