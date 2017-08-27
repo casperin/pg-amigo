@@ -12,7 +12,7 @@ import (
 
 var (
 	PG    *sqlx.DB // connected to PG, but no specific db
-	Error error    = errors.New("Not yet connected.")
+	Error error    = errors.New("Not yet connected to PG.")
 	Conns          = map[string]*sqlx.DB{}
 )
 
@@ -43,7 +43,7 @@ func connectTo(dbName string) error {
 		),
 	)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "Connecting to %s failed", dbName)
 	}
 	Conns[dbName] = db
 	return nil
@@ -52,7 +52,7 @@ func connectTo(dbName string) error {
 func GetDB(dbName string) (*sqlx.DB, error) {
 	if Conns[dbName] == nil {
 		if err := connectTo(dbName); err != nil {
-			return nil, err
+			return nil, errors.Wrapf(err, "Could not connect to %s", dbName)
 		}
 	}
 	return Conns[dbName], nil

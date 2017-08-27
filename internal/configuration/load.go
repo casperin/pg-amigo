@@ -10,5 +10,5 @@ func init() {
 	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
 
-	viper.ReadInConfig() // ignore error
+	viper.ReadInConfig() // if there is any
 }
