@@ -1,8 +1,32 @@
 {{define "body"}}
 <h1>{{.dbName}}</h1>
-<ul>
-    {{range $_, $t := .tables}}
-    <li>{{$t}}</li>
-    {{end}}
-</ul>
+
+<table>
+    <tbody>
+        {{range $tableName, $fields := .tables}}
+        <tr>
+            <th colspan=4>{{$tableName}}</th>
+        </tr>
+        <tr class=labels>
+            <td>Column name</td>
+            <td>Data type</td>
+            <td>Nullable</td>
+            <td>Default</td>
+        </tr>
+        {{range $_, $f := $fields}}
+        <tr>
+            <td>{{$f.ColumnName}}</td>
+            <td>{{$f.UdtName}}</td>
+            <td>{{$f.IsNullable}}</td>
+            {{if $f.ColumnDefault.Valid}}
+            <td>{{$f.ColumnDefault.String}}</td>
+            {{else}}
+            <td></td>
+            {{end}}
+            </tr>
+        {{end}}
+        {{end}}
+    </tbody>
+</table>
+
 {{end}}

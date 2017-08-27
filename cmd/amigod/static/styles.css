@@ -1,13 +1,41 @@
 body {
-    font: 13px/1.5 sans-serif;
+    font: 15px/1.5 sans-serif;
+    background: #222;
+    color: #aaa;
+}
+a:link {
+    color: #58f;
+    text-decoration: none;
+}
+a:visited {
+    color: #a8f;
+}
+a:hover {
+    text-decoration: underline;
 }
 
 .logo {
     float: right;
     text-decoration: none;
     display: inline-block;
-    transition: 1s;
+    transition: .1s;
 }
 .logo:hover {
-    transform: rotate(-.1turn);
+    transition: 2s;
+    transform: rotate(-.2turn);
+    text-decoration: none;
+}
+
+table {
+    border-collapse: collapse;
+}
+tr.labels td {
+    color: #c85;
+}
+th {
+    background: #1a1a1a;
+}
+td {
+    padding: .1em .3em;
+    border: 1px solid #444;
 }

@@ -45,6 +45,14 @@ func MustServe(w http.ResponseWriter, content Content, names ...string) {
 	must(serve(w, content, names...))
 }
 
+func MustServeOr500(w http.ResponseWriter, err error, content Content, names ...string) {
+	if err != nil {
+		MustServeError(w, 500, err)
+		return
+	}
+	MustServe(w, content, names...)
+}
+
 func must(err error) {
 	if err != nil {
 		panic(err)

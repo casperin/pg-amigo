@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	DB    *sqlx.DB
-	Error error = errors.New("Not yet connected.")
-	Conns       = map[string]*sqlx.DB{}
+	PG    *sqlx.DB // connected to PG, but no specific db
+	Error error    = errors.New("Not yet connected.")
+	Conns          = map[string]*sqlx.DB{}
 )
 
 func init() {
@@ -21,7 +21,7 @@ func init() {
 }
 
 func Connect() {
-	DB, Error = sqlx.Connect(
+	PG, Error = sqlx.Connect(
 		"postgres",
 		fmt.Sprintf(
 			"user=%s password=%s sslmode=disable",
