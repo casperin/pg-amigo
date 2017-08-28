@@ -17,17 +17,26 @@ import (
 func main() {
 	r := chi.NewRouter()
 
-	// CSS
+	// CSS && js
 	wd, _ := os.Getwd()
-	cssPath := filepath.Join(wd, "cmd", "amigod", "static", "styles.css")
+	staticPath := filepath.Join(wd, "cmd", "amigod", "static")
 	r.Get("/styles.css", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, cssPath)
+		http.ServeFile(w, r, filepath.Join(staticPath, "styles.css"))
 	})
+	r.Get("/hyperhtml.js", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(staticPath, "hyperhtml.js"))
+	})
+
+	r.Get("/login", handlers.Login)
+	r.Post("/login", handlers.LoginPost)
 
 	r.Route("/", func(r chi.Router) {
 		r.Use(middleware.MustBeConnected)
+		r.Use(middleware.MustBeLoggedIn)
 		r.Get("/", handlers.Index)
+
 		r.Get("/db/{db}", handlers.Database)
+		r.Post("/db/new", handlers.NewDatabase)
 	})
 
 	port := viper.GetString("port")

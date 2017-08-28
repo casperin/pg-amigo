@@ -7,4 +7,38 @@
     </li>
     {{end}}
 </ul>
+
+<hr>
+
+<form action=/db/new method=POST>
+    <input name=dbName placeholder="database name" required />
+    <button type=submit>Create new database</button>
+</form>
+<!--
+<script src="/hyperhtml.js"></script>
+<script>
+var root = document.querySelector("#yo")
+var render = hyperHTML.bind(root)
+var state = {
+    hello: 'yo',
+    kids: [{name: 'alice'}, {name: 'bob'}, {name: 'carl'}]
+}
+
+function update() {
+    render`<div>
+        <h1>${state.hello}</h1>
+        <ul>${state.kids.map(li)}</ul>
+    </div>`
+}
+
+var li = kid => hyperHTML.wire(kid)`<li>${kid.name}</li>`
+
+update()
+
+setTimeout(() => {
+    state.hello = 'hi'
+    update()
+}, 1000)
+</script>
+-->
 {{end}}

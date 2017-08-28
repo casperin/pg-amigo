@@ -12,6 +12,11 @@
         <link rel=stylesheet href=/styles.css />
     </head>
     <body>
+        {{if .error}}
+        <div class=error>
+            <span>{{.error}}</span>
+        </div>
+        {{end}}
         <h1 class=header>
             <a href=/ class=logo>👨</a>
         </h1>

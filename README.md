@@ -22,3 +22,18 @@ or create a `config.json`:
 }
 ```
 See `internal/configuration/load.go` for what can be configured.
+
+## Login system
+
+You can add a `app_password` to the config to force a user to login in before
+accessing all the databases.
+
+If you want logins to persist across server restarts, then you have to provide
+an `app_secret` as well.
+
+```js
+{
+    "app_password": "abc123",
+    "app_secret": "VeRy_SeCrEt_StRiNg!"
+}
+```
