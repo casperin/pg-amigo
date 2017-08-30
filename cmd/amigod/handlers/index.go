@@ -26,3 +26,13 @@ func NewDatabase(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, redirctUrl, 302)
 }
+
+func DeleteDatabase(w http.ResponseWriter, r *http.Request) {
+	err := database.DeleteDatabase(r.FormValue("dbName"))
+	redirctUrl := "/"
+	if err != nil {
+		log.Println(err)
+		redirctUrl += fmt.Sprintf("?error=%s", err)
+	}
+	http.Redirect(w, r, redirctUrl, 302)
+}

@@ -57,3 +57,11 @@ func GetDB(dbName string) (*sqlx.DB, error) {
 	}
 	return Conns[dbName], nil
 }
+
+func DropConnectionTo(dbName string) error {
+	db := Conns[dbName]
+	if db == nil {
+		return nil
+	}
+	return db.Close()
+}

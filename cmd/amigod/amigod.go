@@ -37,6 +37,7 @@ func main() {
 
 		r.Get("/db/{db}", handlers.Database)
 		r.Post("/db/new", handlers.NewDatabase)
+		r.Post("/db/delete", handlers.DeleteDatabase)
 	})
 
 	port := viper.GetString("port")
