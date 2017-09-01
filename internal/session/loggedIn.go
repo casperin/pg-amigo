@@ -3,13 +3,12 @@ package session
 import (
 	"net/http"
 
-	"github.com/casperin/pg-amigo/internal/util/str"
 	"github.com/gorilla/sessions"
 	"github.com/spf13/viper"
 )
 
-var appSecret = str.OrBytes([]byte(viper.GetString("app_secret")), str.Random(10))
-var store = sessions.NewCookieStore(appSecret)
+var appSecret = viper.GetString("app_secret")
+var store = sessions.NewCookieStore([]byte(appSecret))
 
 func Login(w http.ResponseWriter, r *http.Request) error {
 	// See: https://github.com/gorilla/sessions/issues/16 why error is ignored

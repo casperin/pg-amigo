@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/casperin/pg-amigo/internal/connection"
@@ -20,23 +19,25 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func NewDatabase(w http.ResponseWriter, r *http.Request) {
+	dbName := r.FormValue("dbName")
 	db := connection.Pg()
-	err := database.CreateNewDatabase(db, r.FormValue("dbName"))
+	err := database.CreateNewDatabase(db, dbName)
 	redirctUrl := "/"
 	if err != nil {
-		log.Println(err)
-		redirctUrl += fmt.Sprintf("?error=%s", err)
+		// We don't serve 500 here because the error may be that the user is
+		// connected to the db from elsewhere.
+		redirctUrl += fmt.Sprintf("db/%s?error=%s", dbName, err)
 	}
 	http.Redirect(w, r, redirctUrl, 302)
 }
 
 func DeleteDatabase(w http.ResponseWriter, r *http.Request) {
 	db := connection.Pg()
-	err := database.DeleteDatabase(db, r.FormValue("dbName"))
-	redirctUrl := "/"
+	dbName := r.FormValue("dbName")
+	err := database.DeleteDatabase(db, dbName)
 	if err != nil {
-		log.Println(err)
-		redirctUrl += fmt.Sprintf("?error=%s", err)
+		serveError(w, 500, err)
+		return
 	}
-	http.Redirect(w, r, redirctUrl, 302)
+	http.Redirect(w, r, "/", 302)
 }
