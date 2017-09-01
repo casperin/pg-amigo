@@ -5,12 +5,11 @@ import (
 	"net/http"
 
 	"github.com/casperin/pg-amigo/internal/connection"
-	"github.com/casperin/pg-amigo/internal/database"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	db := connection.Pg()
-	dbs, err := database.GetDatabaseNames(db)
+	dbs, err := connection.GetDatabaseNames(db)
 	c := Content{
 		"databases": dbs,
 		"error":     r.FormValue("error"),
@@ -21,7 +20,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 func NewDatabase(w http.ResponseWriter, r *http.Request) {
 	dbName := r.FormValue("dbName")
 	db := connection.Pg()
-	err := database.CreateNewDatabase(db, dbName)
+	err := connection.CreateNewDatabase(db, dbName)
 	redirctUrl := "/"
 	if err != nil {
 		// We don't serve 500 here because the error may be that the user is
@@ -34,7 +33,7 @@ func NewDatabase(w http.ResponseWriter, r *http.Request) {
 func DeleteDatabase(w http.ResponseWriter, r *http.Request) {
 	db := connection.Pg()
 	dbName := r.FormValue("dbName")
-	err := database.DeleteDatabase(db, dbName)
+	err := connection.DeleteDatabase(db, dbName)
 	if err != nil {
 		serveError(w, 500, err)
 		return

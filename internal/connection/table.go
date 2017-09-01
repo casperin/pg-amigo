@@ -1,13 +1,12 @@
-package table
+package connection
 
 import (
 	"database/sql"
 
-	"github.com/casperin/pg-amigo/internal/connection"
 	"github.com/pkg/errors"
 )
 
-type Column struct {
+type TableColumn struct {
 	TableName     string         `db:"table_name"`
 	ColumnName    string         `db:"column_name"`
 	IsNullable    string         `db:"is_nullable"`
@@ -15,8 +14,8 @@ type Column struct {
 	UdtName       string         `db:"udt_name"`
 }
 
-func GetTablesOverview(c connection.Selecter, dbName string) (map[string][]*Column, error) {
-	var columns []*Column
+func GetTablesOverview(c Selecter, dbName string) (map[string][]*TableColumn, error) {
+	var columns []*TableColumn
 	err := c.Select(
 		&columns,
 		// There is a *lot* more that can be asked for here
@@ -31,10 +30,10 @@ func GetTablesOverview(c connection.Selecter, dbName string) (map[string][]*Colu
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not get table information for db: "+dbName)
 	}
-	tables := map[string][]*Column{}
+	tables := map[string][]*TableColumn{}
 	for _, c := range columns {
 		if tables[c.TableName] == nil {
-			tables[c.TableName] = []*Column{}
+			tables[c.TableName] = []*TableColumn{}
 		}
 		tables[c.TableName] = append(tables[c.TableName], c)
 	}
