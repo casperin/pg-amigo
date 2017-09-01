@@ -31,7 +31,6 @@ func main() {
 	r.Post("/login", handlers.LoginPost)
 
 	r.Route("/", func(r chi.Router) {
-		r.Use(middleware.MustBeConnected)
 		r.Use(middleware.MustBeLoggedIn)
 		r.Get("/", handlers.Index)
 

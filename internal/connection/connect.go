@@ -1,6 +1,7 @@
 package connection
 
 import (
+	"database/sql"
 	"fmt"
 
 	_ "github.com/casperin/pg-amigo/internal/configuration"
@@ -11,57 +12,61 @@ import (
 )
 
 var (
-	PG    *sqlx.DB // connected to PG, but no specific db
-	Error error    = errors.New("Not yet connected to PG.")
-	Conns          = map[string]*sqlx.DB{}
+	pgUsername string = viper.GetString("pg_username")
+	pgPassword string = viper.GetString("pg_password")
 )
 
-func init() {
-	Connect()
+type Selecter interface {
+	Select(dest interface{}, query string, args ...interface{}) error
 }
 
-func Connect() {
-	PG, Error = sqlx.Connect(
-		"postgres",
-		fmt.Sprintf(
+type Conn struct {
+	DBName string
+}
+
+func (c *Conn) connect() (*sqlx.DB, error) {
+	cs := connectionString(c.DBName)
+	return sqlx.Connect("postgres", cs)
+}
+
+func connectionString(dbName string) string {
+	if dbName == "" {
+		return fmt.Sprintf(
 			"user=%s password=%s sslmode=disable",
-			viper.GetString("pg_username"),
-			viper.GetString("pg_password"),
-		),
+			pgUsername,
+			pgPassword,
+		)
+	}
+	return fmt.Sprintf(
+		"user=%s password=%s dbname=%s sslmode=disable",
+		pgUsername,
+		pgPassword,
+		dbName,
 	)
 }
 
-// This seems crazy. Don't know pg well enough >_<)
-func connectTo(dbName string) error {
-	db, err := sqlx.Connect(
-		"postgres",
-		fmt.Sprintf(
-			"user=%s password=%s dbname=%s sslmode=disable",
-			viper.GetString("pg_username"),
-			viper.GetString("pg_password"),
-			dbName,
-		),
-	)
+func Pg() *Conn {
+	return &Conn{}
+}
+
+func New(dbName string) *Conn {
+	return &Conn{dbName}
+}
+
+func (c *Conn) Exec(query string, args ...interface{}) (sql.Result, error) {
+	db, err := c.connect()
 	if err != nil {
-		return errors.Wrapf(err, "Connecting to %s failed", dbName)
+		return nil, errors.Wrapf(err, "Could not connect to db %s\n", c.DBName)
 	}
-	Conns[dbName] = db
-	return nil
+	defer db.Close()
+	return db.Exec(query, args...)
 }
 
-func GetDB(dbName string) (*sqlx.DB, error) {
-	if Conns[dbName] == nil {
-		if err := connectTo(dbName); err != nil {
-			return nil, errors.Wrapf(err, "Could not connect to %s", dbName)
-		}
+func (c *Conn) Select(dest interface{}, query string, args ...interface{}) error {
+	db, err := c.connect()
+	if err != nil {
+		return errors.Wrapf(err, "Could not connect to db %s\n", c.DBName)
 	}
-	return Conns[dbName], nil
-}
-
-func DropConnectionTo(dbName string) error {
-	db := Conns[dbName]
-	if db == nil {
-		return nil
-	}
-	return db.Close()
+	defer db.Close()
+	return db.Select(dest, query, args...)
 }

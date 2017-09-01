@@ -1,10 +1,8 @@
 package database
 
-import "github.com/casperin/pg-amigo/internal/connection"
+import "github.com/jmoiron/sqlx"
 
-func DeleteDatabase(dbName string) error {
-	if err := connection.DropConnectionTo(dbName); err != nil {
-		return err
-	}
-	return connection.PGExec(`drop database ` + dbName)
+func DeleteDatabase(c sqlx.Execer, dbName string) error {
+	_, err := c.Exec(`drop database ` + dbName)
+	return err
 }

@@ -15,13 +15,9 @@ type Column struct {
 	UdtName       string         `db:"udt_name"`
 }
 
-func GetTablesOverview(dbName string) (map[string][]*Column, error) {
-	db, err := connection.GetDB(dbName)
-	if err != nil {
-		return nil, errors.Wrap(err, "Could not get db: "+dbName)
-	}
+func GetTablesOverview(c connection.Selecter, dbName string) (map[string][]*Column, error) {
 	var columns []*Column
-	err = db.Select(
+	err := c.Select(
 		&columns,
 		// There is a *lot* more that can be asked for here
 		`SELECT table_name, column_name, is_nullable, column_default, udt_name

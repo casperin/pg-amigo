@@ -1,7 +1,8 @@
 package database
 
-import "github.com/casperin/pg-amigo/internal/connection"
+import "github.com/jmoiron/sqlx"
 
-func CreateNewDatabase(dbName string) error {
-	return connection.PGExec(`create database ` + dbName)
+func CreateNewDatabase(c sqlx.Execer, dbName string) error {
+	_, err := c.Exec(`create database ` + dbName)
+	return err
 }

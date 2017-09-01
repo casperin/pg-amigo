@@ -5,11 +5,13 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/casperin/pg-amigo/internal/connection"
 	"github.com/casperin/pg-amigo/internal/database"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	dbs, err := database.GetDatabaseNames()
+	db := connection.Pg()
+	dbs, err := database.GetDatabaseNames(db)
 	c := Content{
 		"databases": dbs,
 		"error":     r.FormValue("error"),
@@ -18,7 +20,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func NewDatabase(w http.ResponseWriter, r *http.Request) {
-	err := database.CreateNewDatabase(r.FormValue("dbName"))
+	db := connection.Pg()
+	err := database.CreateNewDatabase(db, r.FormValue("dbName"))
 	redirctUrl := "/"
 	if err != nil {
 		log.Println(err)
@@ -28,7 +31,8 @@ func NewDatabase(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteDatabase(w http.ResponseWriter, r *http.Request) {
-	err := database.DeleteDatabase(r.FormValue("dbName"))
+	db := connection.Pg()
+	err := database.DeleteDatabase(db, r.FormValue("dbName"))
 	redirctUrl := "/"
 	if err != nil {
 		log.Println(err)
