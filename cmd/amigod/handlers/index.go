@@ -11,8 +11,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	db := connection.Pg()
 	dbs, err := connection.GetDatabaseNames(db)
 	c := Content{
-		"databases": dbs,
 		"error":     r.FormValue("error"),
+		"databases": dbs,
 	}
 	MustServeOr500(w, err, c, "index")
 }
