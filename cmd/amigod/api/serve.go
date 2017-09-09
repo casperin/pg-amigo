@@ -22,3 +22,11 @@ func serveAsJSON(w http.ResponseWriter, data interface{}) {
 		serveError(w, 500, err)
 	}
 }
+
+func serveAsJsonOrError(w http.ResponseWriter, data interface{}, err error) {
+	if err != nil {
+		serveError(w, 500, err)
+		return
+	}
+	serveAsJSON(w, data)
+}

@@ -1,3 +1,5 @@
+var wire = () => hyperHTML.wire()
+
 function create (sel, initialState, render) {
     var x = hyperHTML.bind(document.querySelector(sel))
     render(x, initialState)

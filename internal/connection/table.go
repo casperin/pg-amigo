@@ -39,3 +39,39 @@ func GetTablesOverview(c Selecter, dbName string) (map[string][]*TableColumn, er
 	}
 	return tables, nil
 }
+
+func QueryDB(db Queryer, cmd string) ([]string, [][]interface{}, error) {
+	var columns []string
+	result := [][]interface{}{}
+	rows, err := db.Query(cmd)
+	if err != nil {
+		return columns, result, err
+	}
+	defer rows.Close()
+	columns, err = rows.Columns()
+	if err != nil {
+		return columns, result, err
+	}
+	cols, err := rows.Columns()
+	if err != nil {
+		return columns, result, err
+	}
+	if cols == nil {
+		return columns, result, nil
+	}
+	for rows.Next() {
+		vals := make([]interface{}, len(cols))
+		for i := 0; i < len(cols); i++ {
+			vals[i] = new(interface{})
+		}
+		err = rows.Scan(vals...)
+		if err != nil {
+			return columns, result, err
+		}
+		result = append(result, vals)
+	}
+	if rows.Err() != nil {
+		return columns, result, rows.Err()
+	}
+	return columns, result, nil
+}

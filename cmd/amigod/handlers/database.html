@@ -19,7 +19,10 @@ function yousure() {
     <tbody>
         {{range $tableName, $fields := .tables}}
         <tr>
-            <th colspan=4>{{$tableName}}</th>
+            <th colspan=4>
+                {{$tableName}}
+                <a href="/query/{{$.dbName}}?q=select * from {{$tableName}} limit 100">query</a>
+            </th>
         </tr>
         <tr class=labels>
             <td>Column name</td>

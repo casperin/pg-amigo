@@ -20,6 +20,10 @@ type Selecter interface {
 	Select(dest interface{}, query string, args ...interface{}) error
 }
 
+type Queryer interface {
+	Query(query string, args ...interface{}) (*sql.Rows, error)
+}
+
 type Conn struct {
 	DBName string
 }
@@ -69,4 +73,13 @@ func (c *Conn) Select(dest interface{}, query string, args ...interface{}) error
 	}
 	defer db.Close()
 	return db.Select(dest, query, args...)
+}
+
+func (c *Conn) Query(cmd string, args ...interface{}) (*sql.Rows, error) {
+	db, err := c.connect()
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not connect to db %s\n", c.DBName)
+	}
+	defer db.Close()
+	return db.Query(cmd, args...)
 }

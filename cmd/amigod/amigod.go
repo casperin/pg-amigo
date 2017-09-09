@@ -35,11 +35,13 @@ func main() {
 		r.Get("/db/{db}", handlers.Database)
 		r.Post("/db/new", handlers.NewDatabase)
 		r.Post("/db/delete", handlers.DeleteDatabase)
+		r.Get("/query/{db}", handlers.QueryDB)
 	})
 
 	r.Route("/api", func(r chi.Router) {
 		r.Use(middleware.MustBeLoggedIn)
 		r.Get("/databases", api.Databases)
+		r.Get("/query/{db}", api.Query)
 	})
 
 	port := viper.GetString("port")
