@@ -1,0 +1,30 @@
+{{define "body"}}
+<h1>Query {{.dbName}}</h1>
+<form method=GET>
+    <textarea name="q" cols=100 rows=5>{{.q}}</textarea>
+    <br>
+    <button type=submit>Run query</button>
+</form>
+<br><br>
+<div class=tbl></div>
+<script src=/static/util.js></script>
+<script>
+var render = create(".tbl", {loading: true}, function (x, state) {
+    if (state.loading) return x`Loading.`
+    if (!state.columns) return x`Nothing.`
+    return x`
+        <table>
+            <thead>
+                <tr>${renderTd(state.columns)}</tr>
+            </thead>
+            <tbody>${renderTr(state.rows)}</tbody>
+        </table>
+    `
+})
+
+var renderTr = rows => rows.map(row => wire()`<tr>${renderTd(row)}</tr>`)
+var renderTd = cols => cols.map(col => wire()`<td>${col}</td>`)
+
+fetchJSON("/api/query/{{.dbName}}?q={{.q}}").then(render)
+</script>
+{{end}}
