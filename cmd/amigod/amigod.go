@@ -25,6 +25,10 @@ func main() {
 		http.ServeFile(w, r, filepath.Join(staticPath, file))
 	})
 
+	r.Get("/elm", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(staticPath, "elm.html"))
+	})
+
 	r.Get("/login", handlers.Login)
 	r.Post("/login", handlers.LoginPost)
 

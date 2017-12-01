@@ -1,4 +1,5 @@
 body {
+    margin: 0;
     font: 15px/1.5 sans-serif;
     background: #222;
     color: #ccc;
@@ -27,6 +28,7 @@ input, textarea {
 }
 
 button {
+    min-width: 35px;
     font: inherit;
     background: #2a2a2a;
     padding: .2em .5em;
@@ -38,18 +40,6 @@ button {
 }
 button:hover {
     background: #333;
-}
-
-.logo {
-    float: right;
-    text-decoration: none;
-    display: inline-block;
-    transition: .1s;
-}
-.logo:hover {
-    transition: 2s;
-    transform: rotate(-.2turn);
-    text-decoration: none;
 }
 
 table {
@@ -72,4 +62,30 @@ td {
     color: #fdd;
     border-radius: 5px;
     box-shadow: 0 1px 3px black;
+}
+
+.app {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+}
+
+.sidebar {
+    background: #111;
+    padding: 10px;
+    width: 300px;
+    overflow-y: auto;
+    transition: .2s;
+    margin-left: -310px;
+}
+
+[data-sidebar="open"] .sidebar {
+    margin-left: 0;
+}
+
+.content {
+    padding: 20px;
 }
