@@ -1,5 +1,7 @@
 module Update exposing (..)
 
+import RemoteData
+import Commands.Query exposing (runQuery)
 import Routing exposing (parseLocation)
 import Msgs exposing (Msg(..))
 import Models exposing (Model)
@@ -36,6 +38,12 @@ update msg model =
 
                 Ok () ->
                     { model | error = Nothing } ! []
+
+        RunQuery ->
+            ( { model | queryResponse = RemoteData.Loading, loading = model.loading + 1 }, runQuery "hej!" )
+
+        Msgs.OnQueryResponse resp ->
+            ( { model | queryResponse = resp, loading = model.loading - 1 }, Cmd.none )
 
 
 handleKeyEvent : KeyboardEvent -> Model -> ( Model, Cmd Msg )

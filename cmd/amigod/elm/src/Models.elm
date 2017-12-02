@@ -1,8 +1,21 @@
 module Models exposing (..)
 
+import RemoteData exposing (WebData)
+
 
 type Route
     = Home
+
+
+type alias QueryResponse =
+    { schema : List SchemaColumn
+    , values : List (List String)
+    }
+
+
+type alias SchemaColumn =
+    { name : String
+    }
 
 
 type alias Model =
@@ -10,6 +23,7 @@ type alias Model =
     , route : Route
     , sidebarOpen : Bool
     , ignoreKeyEvents : Bool
+    , queryResponse : WebData QueryResponse
     , error : Maybe String
     }
 
@@ -20,5 +34,6 @@ initialModel route =
     , route = route
     , sidebarOpen = True
     , ignoreKeyEvents = False
+    , queryResponse = RemoteData.NotAsked
     , error = Nothing
     }
