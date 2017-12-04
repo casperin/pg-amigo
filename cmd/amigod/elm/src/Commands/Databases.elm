@@ -18,7 +18,7 @@ fetchDatabaseServer =
 
 databaseServerUrl : String
 databaseServerUrl =
-    "/static/dummyDatabasesData.json"
+    "/api/database-server"
 
 
 databaseServerDecoder : Decoder DatabaseServer

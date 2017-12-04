@@ -20,10 +20,7 @@ page : Model -> Html Msg
 page model =
     case model.route of
         Query ->
-            div []
-                [ h1 [] [ text "query" ]
-                , query model
-                ]
+            query model
 
         Tables ->
             h1 [] [ text "tables" ]

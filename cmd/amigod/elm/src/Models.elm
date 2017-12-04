@@ -4,7 +4,8 @@ import RemoteData exposing (WebData)
 
 
 type Route
-    = Query
+    = Home
+    | Query
     | Tables
 
 

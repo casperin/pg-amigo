@@ -5,7 +5,7 @@ import Models exposing (Model, QueryResponse, SchemaColumn)
 import Msgs exposing (Msg(SetIgnoreKeyEvent, RunQuery, OnUpdateQueryString))
 import Msgs exposing (Msg)
 import Html exposing (Html, text, div, hr, table, textarea, button, thead, tbody, tr, th, td)
-import Html.Attributes exposing (class, autofocus, value, id, placeholder)
+import Html.Attributes exposing (class, autofocus, value, id)
 import Html.Events exposing (onClick, onFocus, onBlur, onInput)
 
 
@@ -20,7 +20,6 @@ query model =
                 , onInput OnUpdateQueryString
                 , onFocus (SetIgnoreKeyEvent True)
                 , onBlur (SetIgnoreKeyEvent False)
-                , placeholder "Press \"q\" to jump to this field"
                 ]
                 []
             , button [ class "run-query-button", onClick RunQuery ] [ text "Run query" ]

@@ -24,15 +24,15 @@ tabs model =
             div [ class "tabs" ]
                 [ databaseSelector databaseServer.databases
                 , a
-                    [ href "#query"
-                    , class <| tern (model.route == Query) "current" ""
-                    ]
-                    [ text "Query" ]
-                , a
                     [ href "#tables"
                     , class <| tern (model.route == Tables) "current" ""
                     ]
                     [ text "Tables" ]
+                , a
+                    [ href "#query"
+                    , class <| tern (model.route == Query) "current" ""
+                    ]
+                    [ text "Query" ]
                 ]
 
 

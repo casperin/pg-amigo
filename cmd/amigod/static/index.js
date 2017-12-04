@@ -11161,7 +11161,7 @@ var _user$project$Commands_Databases$databaseServerDecoder = A3(
 	},
 	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Models$DatabaseServer));
-var _user$project$Commands_Databases$databaseServerUrl = '/static/dummyDatabasesData.json';
+var _user$project$Commands_Databases$databaseServerUrl = '/api/database-server';
 var _user$project$Commands_Databases$fetchDatabaseServer = A2(
 	_elm_lang$core$Platform_Cmd$map,
 	_user$project$Msgs$OnFetchDatabaseServerResponse,
@@ -11476,13 +11476,13 @@ var _user$project$View_Tabs$tabs = function (model) {
 							_elm_lang$html$Html$a,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$href('#query'),
+								_0: _elm_lang$html$Html_Attributes$href('#tables'),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Attributes$class(
 										A3(
 											_user$project$Utils_String$tern,
-											_elm_lang$core$Native_Utils.eq(model.route, _user$project$Models$Query),
+											_elm_lang$core$Native_Utils.eq(model.route, _user$project$Models$Tables),
 											'current',
 											'')),
 									_1: {ctor: '[]'}
@@ -11490,7 +11490,7 @@ var _user$project$View_Tabs$tabs = function (model) {
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Query'),
+								_0: _elm_lang$html$Html$text('Tables'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -11499,13 +11499,13 @@ var _user$project$View_Tabs$tabs = function (model) {
 								_elm_lang$html$Html$a,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$href('#tables'),
+									_0: _elm_lang$html$Html_Attributes$href('#query'),
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$html$Html_Attributes$class(
 											A3(
 												_user$project$Utils_String$tern,
-												_elm_lang$core$Native_Utils.eq(model.route, _user$project$Models$Tables),
+												_elm_lang$core$Native_Utils.eq(model.route, _user$project$Models$Query),
 												'current',
 												'')),
 										_1: {ctor: '[]'}
@@ -11513,7 +11513,7 @@ var _user$project$View_Tabs$tabs = function (model) {
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Tables'),
+									_0: _elm_lang$html$Html$text('Query'),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -11636,11 +11636,7 @@ var _user$project$View_Query$query = function (model) {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Events$onBlur(
 													_user$project$Msgs$SetIgnoreKeyEvent(false)),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$placeholder('Press \"q\" to jump to this field'),
-													_1: {ctor: '[]'}
-												}
+												_1: {ctor: '[]'}
 											}
 										}
 									}
@@ -11698,25 +11694,7 @@ var _user$project$View_Query$query = function (model) {
 var _user$project$View$page = function (model) {
 	var _p0 = model.route;
 	if (_p0.ctor === 'Query') {
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$h1,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('query'),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: _user$project$View_Query$query(model),
-					_1: {ctor: '[]'}
-				}
-			});
+		return _user$project$View_Query$query(model);
 	} else {
 		return A2(
 			_elm_lang$html$Html$h1,

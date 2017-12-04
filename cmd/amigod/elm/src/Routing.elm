@@ -2,7 +2,7 @@ module Routing exposing (..)
 
 import Navigation exposing (Location)
 import Models exposing (Route(Query, Tables))
-import UrlParser exposing (..)
+import UrlParser exposing (Parser, parseHash, map, top, s, oneOf)
 
 
 matchers : Parser (Route -> a) a
