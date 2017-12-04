@@ -1,9 +1,9 @@
 module Utils.String exposing (..)
 
 
-tern : Bool -> String -> String -> String
-tern x a b =
-    if x then
-        a
+tern : Bool -> a -> a -> a
+tern p x y =
+    if p then
+        x
     else
-        b
+        y

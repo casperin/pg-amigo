@@ -1,6 +1,6 @@
 module Msgs exposing (..)
 
-import Navigation exposing (Location)
+import Navigation
 import Keyboard.Event exposing (KeyboardEvent)
 import Models exposing (QueryResponse, DatabaseServer)
 import Dom
@@ -9,7 +9,7 @@ import Http
 
 
 type Msg
-    = OnLocationChange Location
+    = OnLocationChange Navigation.Location
     | HandleKeyboardEvent KeyboardEvent
     | SetIgnoreKeyEvent Bool
     | OnFetchDatabaseServerResponse (WebData DatabaseServer)

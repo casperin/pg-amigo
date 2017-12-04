@@ -10600,6 +10600,257 @@ var _elm_lang$navigation$Navigation$onEffects = F4(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Navigation'] = {pkg: 'elm-lang/navigation', init: _elm_lang$navigation$Navigation$init, onEffects: _elm_lang$navigation$Navigation$onEffects, onSelfMsg: _elm_lang$navigation$Navigation$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$navigation$Navigation$cmdMap, subMap: _elm_lang$navigation$Navigation$subMap};
 
+var _evancz$url_parser$UrlParser$toKeyValuePair = function (segment) {
+	var _p0 = A2(_elm_lang$core$String$split, '=', segment);
+	if (((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '[]')) {
+		return A3(
+			_elm_lang$core$Maybe$map2,
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				}),
+			_elm_lang$http$Http$decodeUri(_p0._0),
+			_elm_lang$http$Http$decodeUri(_p0._1._0));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _evancz$url_parser$UrlParser$parseParams = function (queryString) {
+	return _elm_lang$core$Dict$fromList(
+		A2(
+			_elm_lang$core$List$filterMap,
+			_evancz$url_parser$UrlParser$toKeyValuePair,
+			A2(
+				_elm_lang$core$String$split,
+				'&',
+				A2(_elm_lang$core$String$dropLeft, 1, queryString))));
+};
+var _evancz$url_parser$UrlParser$splitUrl = function (url) {
+	var _p1 = A2(_elm_lang$core$String$split, '/', url);
+	if ((_p1.ctor === '::') && (_p1._0 === '')) {
+		return _p1._1;
+	} else {
+		return _p1;
+	}
+};
+var _evancz$url_parser$UrlParser$parseHelp = function (states) {
+	parseHelp:
+	while (true) {
+		var _p2 = states;
+		if (_p2.ctor === '[]') {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			var _p4 = _p2._0;
+			var _p3 = _p4.unvisited;
+			if (_p3.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p4.value);
+			} else {
+				if ((_p3._0 === '') && (_p3._1.ctor === '[]')) {
+					return _elm_lang$core$Maybe$Just(_p4.value);
+				} else {
+					var _v4 = _p2._1;
+					states = _v4;
+					continue parseHelp;
+				}
+			}
+		}
+	}
+};
+var _evancz$url_parser$UrlParser$parse = F3(
+	function (_p5, url, params) {
+		var _p6 = _p5;
+		return _evancz$url_parser$UrlParser$parseHelp(
+			_p6._0(
+				{
+					visited: {ctor: '[]'},
+					unvisited: _evancz$url_parser$UrlParser$splitUrl(url),
+					params: params,
+					value: _elm_lang$core$Basics$identity
+				}));
+	});
+var _evancz$url_parser$UrlParser$parseHash = F2(
+	function (parser, location) {
+		return A3(
+			_evancz$url_parser$UrlParser$parse,
+			parser,
+			A2(_elm_lang$core$String$dropLeft, 1, location.hash),
+			_evancz$url_parser$UrlParser$parseParams(location.search));
+	});
+var _evancz$url_parser$UrlParser$parsePath = F2(
+	function (parser, location) {
+		return A3(
+			_evancz$url_parser$UrlParser$parse,
+			parser,
+			location.pathname,
+			_evancz$url_parser$UrlParser$parseParams(location.search));
+	});
+var _evancz$url_parser$UrlParser$intParamHelp = function (maybeValue) {
+	var _p7 = maybeValue;
+	if (_p7.ctor === 'Nothing') {
+		return _elm_lang$core$Maybe$Nothing;
+	} else {
+		return _elm_lang$core$Result$toMaybe(
+			_elm_lang$core$String$toInt(_p7._0));
+	}
+};
+var _evancz$url_parser$UrlParser$mapHelp = F2(
+	function (func, _p8) {
+		var _p9 = _p8;
+		return {
+			visited: _p9.visited,
+			unvisited: _p9.unvisited,
+			params: _p9.params,
+			value: func(_p9.value)
+		};
+	});
+var _evancz$url_parser$UrlParser$State = F4(
+	function (a, b, c, d) {
+		return {visited: a, unvisited: b, params: c, value: d};
+	});
+var _evancz$url_parser$UrlParser$Parser = function (a) {
+	return {ctor: 'Parser', _0: a};
+};
+var _evancz$url_parser$UrlParser$s = function (str) {
+	return _evancz$url_parser$UrlParser$Parser(
+		function (_p10) {
+			var _p11 = _p10;
+			var _p12 = _p11.unvisited;
+			if (_p12.ctor === '[]') {
+				return {ctor: '[]'};
+			} else {
+				var _p13 = _p12._0;
+				return _elm_lang$core$Native_Utils.eq(_p13, str) ? {
+					ctor: '::',
+					_0: A4(
+						_evancz$url_parser$UrlParser$State,
+						{ctor: '::', _0: _p13, _1: _p11.visited},
+						_p12._1,
+						_p11.params,
+						_p11.value),
+					_1: {ctor: '[]'}
+				} : {ctor: '[]'};
+			}
+		});
+};
+var _evancz$url_parser$UrlParser$custom = F2(
+	function (tipe, stringToSomething) {
+		return _evancz$url_parser$UrlParser$Parser(
+			function (_p14) {
+				var _p15 = _p14;
+				var _p16 = _p15.unvisited;
+				if (_p16.ctor === '[]') {
+					return {ctor: '[]'};
+				} else {
+					var _p18 = _p16._0;
+					var _p17 = stringToSomething(_p18);
+					if (_p17.ctor === 'Ok') {
+						return {
+							ctor: '::',
+							_0: A4(
+								_evancz$url_parser$UrlParser$State,
+								{ctor: '::', _0: _p18, _1: _p15.visited},
+								_p16._1,
+								_p15.params,
+								_p15.value(_p17._0)),
+							_1: {ctor: '[]'}
+						};
+					} else {
+						return {ctor: '[]'};
+					}
+				}
+			});
+	});
+var _evancz$url_parser$UrlParser$string = A2(_evancz$url_parser$UrlParser$custom, 'STRING', _elm_lang$core$Result$Ok);
+var _evancz$url_parser$UrlParser$int = A2(_evancz$url_parser$UrlParser$custom, 'NUMBER', _elm_lang$core$String$toInt);
+var _evancz$url_parser$UrlParser_ops = _evancz$url_parser$UrlParser_ops || {};
+_evancz$url_parser$UrlParser_ops['</>'] = F2(
+	function (_p20, _p19) {
+		var _p21 = _p20;
+		var _p22 = _p19;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (state) {
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_p22._0,
+					_p21._0(state));
+			});
+	});
+var _evancz$url_parser$UrlParser$map = F2(
+	function (subValue, _p23) {
+		var _p24 = _p23;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (_p25) {
+				var _p26 = _p25;
+				return A2(
+					_elm_lang$core$List$map,
+					_evancz$url_parser$UrlParser$mapHelp(_p26.value),
+					_p24._0(
+						{visited: _p26.visited, unvisited: _p26.unvisited, params: _p26.params, value: subValue}));
+			});
+	});
+var _evancz$url_parser$UrlParser$oneOf = function (parsers) {
+	return _evancz$url_parser$UrlParser$Parser(
+		function (state) {
+			return A2(
+				_elm_lang$core$List$concatMap,
+				function (_p27) {
+					var _p28 = _p27;
+					return _p28._0(state);
+				},
+				parsers);
+		});
+};
+var _evancz$url_parser$UrlParser$top = _evancz$url_parser$UrlParser$Parser(
+	function (state) {
+		return {
+			ctor: '::',
+			_0: state,
+			_1: {ctor: '[]'}
+		};
+	});
+var _evancz$url_parser$UrlParser_ops = _evancz$url_parser$UrlParser_ops || {};
+_evancz$url_parser$UrlParser_ops['<?>'] = F2(
+	function (_p30, _p29) {
+		var _p31 = _p30;
+		var _p32 = _p29;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (state) {
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_p32._0,
+					_p31._0(state));
+			});
+	});
+var _evancz$url_parser$UrlParser$QueryParser = function (a) {
+	return {ctor: 'QueryParser', _0: a};
+};
+var _evancz$url_parser$UrlParser$customParam = F2(
+	function (key, func) {
+		return _evancz$url_parser$UrlParser$QueryParser(
+			function (_p33) {
+				var _p34 = _p33;
+				var _p35 = _p34.params;
+				return {
+					ctor: '::',
+					_0: A4(
+						_evancz$url_parser$UrlParser$State,
+						_p34.visited,
+						_p34.unvisited,
+						_p35,
+						_p34.value(
+							func(
+								A2(_elm_lang$core$Dict$get, key, _p35)))),
+					_1: {ctor: '[]'}
+				};
+			});
+	});
+var _evancz$url_parser$UrlParser$stringParam = function (name) {
+	return A2(_evancz$url_parser$UrlParser$customParam, name, _elm_lang$core$Basics$identity);
+};
+var _evancz$url_parser$UrlParser$intParam = function (name) {
+	return A2(_evancz$url_parser$UrlParser$customParam, name, _evancz$url_parser$UrlParser$intParamHelp);
+};
+
 var _krisajenkins$remotedata$RemoteData$isNotAsked = function (data) {
 	var _p0 = data;
 	if (_p0.ctor === 'NotAsked') {
@@ -10870,7 +11121,8 @@ var _user$project$Models$Model = F8(
 	function (a, b, c, d, e, f, g, h) {
 		return {loading: a, route: b, ignoreKeyEvents: c, databaseServer: d, selectedDatabase: e, queryString: f, queryResponse: g, error: h};
 	});
-var _user$project$Models$Home = {ctor: 'Home'};
+var _user$project$Models$Tables = {ctor: 'Tables'};
+var _user$project$Models$Query = {ctor: 'Query'};
 
 var _user$project$Msgs$OnQueryResponse = function (a) {
 	return {ctor: 'OnQueryResponse', _0: a};
@@ -10966,42 +11218,83 @@ var _user$project$Commands_Query$runQuery = function (query) {
 				_user$project$Commands_Query$queryDecoder)));
 };
 
+var _user$project$Routing$matchers = _evancz$url_parser$UrlParser$oneOf(
+	{
+		ctor: '::',
+		_0: A2(_evancz$url_parser$UrlParser$map, _user$project$Models$Query, _evancz$url_parser$UrlParser$top),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_evancz$url_parser$UrlParser$map,
+				_user$project$Models$Query,
+				_evancz$url_parser$UrlParser$s('query')),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_evancz$url_parser$UrlParser$map,
+					_user$project$Models$Tables,
+					_evancz$url_parser$UrlParser$s('tables')),
+				_1: {ctor: '[]'}
+			}
+		}
+	});
 var _user$project$Routing$parseLocation = function (location) {
-	return _user$project$Models$Home;
+	var _p0 = A2(_evancz$url_parser$UrlParser$parseHash, _user$project$Routing$matchers, location);
+	if (_p0.ctor === 'Just') {
+		return _p0._0;
+	} else {
+		return _user$project$Models$Query;
+	}
 };
 
 var _user$project$Update$handleKeyEvent = F2(
 	function (event, model) {
 		var _p0 = event.key;
-		if ((_p0.ctor === 'Just') && (_p0._0 === 'q')) {
-			return A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
-				model,
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$core$Task$attempt,
-						_user$project$Msgs$OnFocusQuery,
-						_elm_lang$dom$Dom$focus('query')),
-					_1: {ctor: '[]'}
-				});
-		} else {
-			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-		}
+		_v0_2:
+		do {
+			if (_p0.ctor === 'Just') {
+				switch (_p0._0) {
+					case 'q':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{route: _user$project$Models$Query}),
+							_1: _elm_lang$navigation$Navigation$load('#query')
+						};
+					case 't':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{route: _user$project$Models$Query}),
+							_1: _elm_lang$navigation$Navigation$load('#tables')
+						};
+					default:
+						break _v0_2;
+				}
+			} else {
+				break _v0_2;
+			}
+		} while(false);
+		return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 	});
 var _user$project$Update$update = F2(
 	function (msg, model) {
 		var _p1 = msg;
 		switch (_p1.ctor) {
 			case 'OnLocationChange':
+				var route = _user$project$Routing$parseLocation(_p1._0);
+				var cmd = _elm_lang$core$Native_Utils.eq(route, _user$project$Models$Query) ? A2(
+					_elm_lang$core$Task$attempt,
+					_user$project$Msgs$OnFocusQuery,
+					_elm_lang$dom$Dom$focus('query')) : _elm_lang$core$Platform_Cmd$none;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							route: _user$project$Routing$parseLocation(_p1._0)
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
+						{route: route}),
+					_1: cmd
 				};
 			case 'HandleKeyboardEvent':
 				return model.ignoreKeyEvents ? {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none} : A2(_user$project$Update$handleKeyEvent, _p1._0, model);
@@ -11080,59 +11373,50 @@ var _user$project$Update$update = F2(
 		}
 	});
 
-var _user$project$Utils_List$nth = F2(
-	function (n, xs) {
-		nth:
-		while (true) {
-			if (_elm_lang$core$Native_Utils.cmp(n, 0) < 0) {
-				return _elm_lang$core$Maybe$Nothing;
-			} else {
-				var _p0 = {ctor: '_Tuple2', _0: xs, _1: n};
-				if (_p0._0.ctor === '[]') {
-					return _elm_lang$core$Maybe$Nothing;
-				} else {
-					if (_p0._1 === 0) {
-						return _elm_lang$core$Maybe$Just(_p0._0._0);
-					} else {
-						var _v1 = _p0._1 - 1,
-							_v2 = _p0._0._1;
-						n = _v1;
-						xs = _v2;
-						continue nth;
-					}
-				}
-			}
-		}
+var _user$project$Utils_String$tern = F3(
+	function (p, x, y) {
+		return p ? x : y;
 	});
 
-var _user$project$View_Sidebar$databaseSelector = function (dbs) {
+var _user$project$View_Tabs$databaseSelector = function (dbs) {
 	return A2(
-		_elm_lang$html$Html$select,
+		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$disabled(
-				_elm_lang$core$List$isEmpty(dbs)),
+			_0: _elm_lang$html$Html_Attributes$class('database-selector'),
 			_1: {ctor: '[]'}
 		},
-		A2(
-			_elm_lang$core$List$map,
-			function (db) {
-				return A2(
-					_elm_lang$html$Html$option,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$value(db),
-						_1: {ctor: '[]'}
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$select,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$disabled(
+						_elm_lang$core$List$isEmpty(dbs)),
+					_1: {ctor: '[]'}
+				},
+				A2(
+					_elm_lang$core$List$map,
+					function (db) {
+						return A2(
+							_elm_lang$html$Html$option,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$value(db),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(db),
+								_1: {ctor: '[]'}
+							});
 					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(db),
-						_1: {ctor: '[]'}
-					});
-			},
-			dbs));
+					dbs)),
+			_1: {ctor: '[]'}
+		});
 };
-var _user$project$View_Sidebar$sidebar = function (model) {
+var _user$project$View_Tabs$tabs = function (model) {
 	var _p0 = model.databaseServer;
 	switch (_p0.ctor) {
 		case 'NotAsked':
@@ -11140,7 +11424,7 @@ var _user$project$View_Sidebar$sidebar = function (model) {
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+					_0: _elm_lang$html$Html_Attributes$class('tabs'),
 					_1: {ctor: '[]'}
 				},
 				{
@@ -11153,7 +11437,7 @@ var _user$project$View_Sidebar$sidebar = function (model) {
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+					_0: _elm_lang$html$Html_Attributes$class('tabs'),
 					_1: {ctor: '[]'}
 				},
 				{
@@ -11166,7 +11450,7 @@ var _user$project$View_Sidebar$sidebar = function (model) {
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+					_0: _elm_lang$html$Html_Attributes$class('tabs'),
 					_1: {ctor: '[]'}
 				},
 				{
@@ -11180,13 +11464,61 @@ var _user$project$View_Sidebar$sidebar = function (model) {
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+					_0: _elm_lang$html$Html_Attributes$class('tabs'),
 					_1: {ctor: '[]'}
 				},
 				{
 					ctor: '::',
-					_0: _user$project$View_Sidebar$databaseSelector(_p0._0.databases),
-					_1: {ctor: '[]'}
+					_0: _user$project$View_Tabs$databaseSelector(_p0._0.databases),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$a,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$href('#query'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class(
+										A3(
+											_user$project$Utils_String$tern,
+											_elm_lang$core$Native_Utils.eq(model.route, _user$project$Models$Query),
+											'current',
+											'')),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Query'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$a,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$href('#tables'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class(
+											A3(
+												_user$project$Utils_String$tern,
+												_elm_lang$core$Native_Utils.eq(model.route, _user$project$Models$Tables),
+												'current',
+												'')),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Tables'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}
 				});
 	}
 };
@@ -11220,7 +11552,7 @@ var _user$project$View_Query$schema = function (sc) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$View_Query$query = function (resp) {
+var _user$project$View_Query$queryResponse = function (resp) {
 	var _p0 = resp;
 	switch (_p0.ctor) {
 		case 'NotAsked':
@@ -11263,7 +11595,139 @@ var _user$project$View_Query$query = function (resp) {
 				});
 	}
 };
+var _user$project$View_Query$query = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('query-page'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('query-container'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$textarea,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$id('query'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$autofocus(true),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$value(model.queryString),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Msgs$OnUpdateQueryString),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onFocus(
+												_user$project$Msgs$SetIgnoreKeyEvent(true)),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onBlur(
+													_user$project$Msgs$SetIgnoreKeyEvent(false)),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$placeholder('Press \"q\" to jump to this field'),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('run-query-button'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_user$project$Msgs$RunQuery),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Run query'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$hr,
+					{ctor: '[]'},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('query-result-container'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _user$project$View_Query$queryResponse(model.queryResponse),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
 
+var _user$project$View$page = function (model) {
+	var _p0 = model.route;
+	if (_p0.ctor === 'Query') {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h1,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('query'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: _user$project$View_Query$query(model),
+					_1: {ctor: '[]'}
+				}
+			});
+	} else {
+		return A2(
+			_elm_lang$html$Html$h1,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('tables'),
+				_1: {ctor: '[]'}
+			});
+	}
+};
 var _user$project$View$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -11274,7 +11738,7 @@ var _user$project$View$view = function (model) {
 		},
 		{
 			ctor: '::',
-			_0: _user$project$View_Sidebar$sidebar(model),
+			_0: _user$project$View_Tabs$tabs(model),
 			_1: {
 				ctor: '::',
 				_0: A2(
@@ -11286,82 +11750,8 @@ var _user$project$View$view = function (model) {
 					},
 					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('query-container'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$textarea,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$id('query'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$value(model.queryString),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(_user$project$Msgs$OnUpdateQueryString),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onFocus(
-														_user$project$Msgs$SetIgnoreKeyEvent(true)),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onBlur(
-															_user$project$Msgs$SetIgnoreKeyEvent(false)),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$placeholder('Press \"q\" to jump to this field'),
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}
-										}
-									},
-									{ctor: '[]'}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$button,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('run-query-button'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(_user$project$Msgs$RunQuery),
-												_1: {ctor: '[]'}
-											}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('Run query'),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('query-result-container'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _user$project$View_Query$query(model.queryResponse),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
+						_0: _user$project$View$page(model),
+						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
 			}

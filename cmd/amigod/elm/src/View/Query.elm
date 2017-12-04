@@ -1,14 +1,38 @@
 module View.Query exposing (..)
 
 import RemoteData exposing (WebData)
-import Models exposing (QueryResponse, SchemaColumn)
+import Models exposing (Model, QueryResponse, SchemaColumn)
+import Msgs exposing (Msg(SetIgnoreKeyEvent, RunQuery, OnUpdateQueryString))
 import Msgs exposing (Msg)
-import Html exposing (Html, text, table, thead, tbody, tr, th, td)
-import Html.Attributes exposing (class)
+import Html exposing (Html, text, div, hr, table, textarea, button, thead, tbody, tr, th, td)
+import Html.Attributes exposing (class, autofocus, value, id, placeholder)
+import Html.Events exposing (onClick, onFocus, onBlur, onInput)
 
 
-query : WebData QueryResponse -> Html Msg
-query resp =
+query : Model -> Html Msg
+query model =
+    div [ class "query-page" ]
+        [ div [ class "query-container" ]
+            [ textarea
+                [ id "query"
+                , autofocus True
+                , value model.queryString
+                , onInput OnUpdateQueryString
+                , onFocus (SetIgnoreKeyEvent True)
+                , onBlur (SetIgnoreKeyEvent False)
+                , placeholder "Press \"q\" to jump to this field"
+                ]
+                []
+            , button [ class "run-query-button", onClick RunQuery ] [ text "Run query" ]
+            ]
+        , hr [] []
+        , div [ class "query-result-container" ]
+            [ queryResponse model.queryResponse ]
+        ]
+
+
+queryResponse : WebData QueryResponse -> Html Msg
+queryResponse resp =
     case resp of
         RemoteData.NotAsked ->
             text "No query"

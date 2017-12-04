@@ -4,7 +4,8 @@ import RemoteData exposing (WebData)
 
 
 type Route
-    = Home
+    = Query
+    | Tables
 
 
 type alias QueryResponse =

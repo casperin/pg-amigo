@@ -1,10 +1,11 @@
 module Update exposing (..)
 
 import RemoteData
+import Navigation
 import Commands.Query exposing (runQuery)
 import Routing exposing (parseLocation)
 import Msgs exposing (Msg(..))
-import Models exposing (Model)
+import Models exposing (Model, Route(Query, Tables))
 import Keyboard.Event exposing (KeyboardEvent)
 import Dom exposing (focus)
 import Task
@@ -14,7 +15,19 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnLocationChange location ->
-            ( { model | route = parseLocation location }, Cmd.none )
+            let
+                route =
+                    parseLocation location
+
+                cmd =
+                    if route == Query then
+                        Task.attempt OnFocusQuery (focus "query")
+                    else
+                        Cmd.none
+            in
+                ( { model | route = route }
+                , cmd
+                )
 
         HandleKeyboardEvent event ->
             if model.ignoreKeyEvents then
@@ -53,7 +66,10 @@ handleKeyEvent : KeyboardEvent -> Model -> ( Model, Cmd Msg )
 handleKeyEvent event model =
     case event.key of
         Just "q" ->
-            model ! [ Task.attempt OnFocusQuery (focus "query") ]
+            ( { model | route = Query }, Navigation.load "#query" )
+
+        Just "t" ->
+            ( { model | route = Query }, Navigation.load "#tables" )
 
         _ ->
             ( model, Cmd.none )

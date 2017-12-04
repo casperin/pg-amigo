@@ -1,32 +1,29 @@
 module View exposing (..)
 
-import Html exposing (Html, button, input, div, text, textarea, hr, br)
-import Html.Attributes exposing (id, class, attribute, title, value, placeholder)
-import Html.Events exposing (onClick, onFocus, onBlur, onInput)
-import Models exposing (Model)
-import Msgs exposing (Msg(SetIgnoreKeyEvent, RunQuery, OnUpdateQueryString))
-import View.Sidebar exposing (sidebar)
+import Html exposing (Html, div, h1, text)
+import Html.Attributes exposing (class)
+import Models exposing (Model, Route(Query, Tables))
+import View.Tabs exposing (tabs)
 import View.Query exposing (query)
+import Msgs exposing (Msg)
 
 
 view : Model -> Html Msg
 view model =
     div [ class "app" ]
-        [ sidebar model
-        , div [ class "content" ]
-            [ div [ class "query-container" ]
-                [ textarea
-                    [ id "query"
-                    , value model.queryString
-                    , onInput OnUpdateQueryString
-                    , onFocus (SetIgnoreKeyEvent True)
-                    , onBlur (SetIgnoreKeyEvent False)
-                    , placeholder "Press \"q\" to jump to this field"
-                    ]
-                    []
-                , button [ class "run-query-button", onClick RunQuery ] [ text "Run query" ]
-                ]
-            , div [ class "query-result-container" ]
-                [ query model.queryResponse ]
-            ]
+        [ tabs model
+        , div [ class "content" ] [ page model ]
         ]
+
+
+page : Model -> Html Msg
+page model =
+    case model.route of
+        Query ->
+            div []
+                [ h1 [] [ text "query" ]
+                , query model
+                ]
+
+        Tables ->
+            h1 [] [ text "tables" ]
