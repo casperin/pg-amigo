@@ -2,7 +2,7 @@ module Commands.Query exposing (runQuery)
 
 import Http
 import Json.Encode
-import Json.Decode exposing (Decoder, at, list, string, int, succeed, fail, andThen)
+import Json.Decode exposing (Decoder, at, list, string)
 import Json.Decode.Pipeline exposing (decode, required, requiredAt)
 import Msgs exposing (Msg)
 import Models exposing (QueryResponse, SchemaColumn)
@@ -10,15 +10,15 @@ import RemoteData
 
 
 runQuery : String -> Cmd Msg
-runQuery _ =
-    Http.get queryUrl queryDecoder
+runQuery query =
+    Http.get (queryUrl query) queryDecoder
         |> RemoteData.sendRequest
         |> Cmd.map Msgs.OnQueryResponse
 
 
-queryUrl : String
-queryUrl =
-    "/static/dummyData.json"
+queryUrl : String -> String
+queryUrl query =
+    "/static/dummyQueryData.json?q=" ++ (Http.encodeUri query)
 
 
 queryDecoder : Decoder QueryResponse

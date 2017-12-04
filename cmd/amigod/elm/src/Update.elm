@@ -28,8 +28,14 @@ update msg model =
         SetIgnoreKeyEvent ignore ->
             ( { model | ignoreKeyEvents = ignore }, Cmd.none )
 
+        OnFetchDatabasesResponse resp ->
+            ( { model | structure = resp }, Cmd.none )
+
         FocusQuery ->
             model ! [ Task.attempt OnFocusQuery (focus "query") ]
+
+        OnUpdateQueryString str ->
+            ( { model | queryString = str }, Cmd.none )
 
         OnFocusQuery result ->
             case result of
@@ -40,7 +46,7 @@ update msg model =
                     { model | error = Nothing } ! []
 
         RunQuery ->
-            ( { model | queryResponse = RemoteData.Loading, loading = model.loading + 1 }, runQuery "hej!" )
+            ( { model | queryResponse = RemoteData.Loading, loading = model.loading + 1 }, runQuery model.queryString )
 
         Msgs.OnQueryResponse resp ->
             ( { model | queryResponse = resp, loading = model.loading - 1 }, Cmd.none )

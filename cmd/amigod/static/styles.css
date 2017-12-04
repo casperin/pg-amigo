@@ -1,59 +1,28 @@
 body {
     margin: 0;
-    font: 15px/1.5 sans-serif;
-    background: #222;
-    color: #ccc;
-}
-a:link {
-    color: #58f;
-    text-decoration: none;
-}
-a:visited {
-    color: #36e;
-}
-a:hover {
-    text-decoration: underline;
-}
-hr {
-    border: none;
-    border-top: 1px solid #000;
-    border-bottom: 1px solid #333;
+    font: 14px/1.4 sans-serif;
 }
 input, textarea {
-    font: inherit;
-    background: #181818;
-    border: 1px solid #444;
-    padding: .2em .5em;
-    color: #ccc;
+    font-size: 16px;
+    font-family: monospace;
 }
 
 button {
     min-width: 35px;
     font: inherit;
-    background: #2a2a2a;
-    padding: .2em .5em;
-    border: 1px solid #333;
     cursor: pointer;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, .5);
-    border-radius: 3px;
-    color: #ccc;
-}
-button:hover {
-    background: #333;
 }
 
 table {
+    font-family: monospace;
     border-collapse: collapse;
 }
 tr.labels td {
-    color: #c85;
-}
-th {
-    background: #1a1a1a;
+    color: green;
 }
 td {
     padding: .1em .3em;
-    border: 1px solid #444;
+    border: 1px dashed #888;
 }
 
 .error {
@@ -74,12 +43,12 @@ td {
 }
 
 .sidebar {
-    background: #111;
+    border-right: 10px solid limegreen;
     padding: 10px;
     width: 300px;
     overflow-y: auto;
     transition: .2s;
-    margin-left: -310px;
+    margin-left: -320px;
 }
 
 [data-sidebar="open"] .sidebar {
@@ -88,5 +57,24 @@ td {
 
 .content {
     flex: 1;
-    padding: 20px;
+}
+
+.query-container {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px;
+    background: #def;
+}
+
+.query-container textarea {
+    flex: 1;
+}
+
+.query-container textarea:focus {
+    outline: none;
+    background: #fed;
+}
+
+.query-result-container {
+    padding: 10px;
 }

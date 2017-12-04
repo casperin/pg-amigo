@@ -1,0 +1,19 @@
+{
+    "data": [
+        {
+            "name": "great-db",
+            "kind": "database",
+            "tables": ["users", "posts"],
+            "views": ["old_users"]
+        },
+        {
+            "name": "something-somtehing",
+            "kind": "database",
+            "tables": ["fish"]
+        },
+        {
+            "name": "testing",
+            "kind": "database"
+        }
+    ]
+}

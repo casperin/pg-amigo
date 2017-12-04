@@ -10854,7 +10854,7 @@ var _krisajenkins$remotedata$RemoteData$update = F2(
 	});
 
 var _user$project$Models$initialModel = function (route) {
-	return {loading: 0, route: route, sidebarOpen: true, ignoreKeyEvents: false, queryResponse: _krisajenkins$remotedata$RemoteData$NotAsked, error: _elm_lang$core$Maybe$Nothing};
+	return {loading: 0, route: route, sidebarOpen: true, ignoreKeyEvents: false, structure: _krisajenkins$remotedata$RemoteData$Loading, selectedDatabase: 0, queryString: '', queryResponse: _krisajenkins$remotedata$RemoteData$NotAsked, error: _elm_lang$core$Maybe$Nothing};
 };
 var _user$project$Models$QueryResponse = F2(
 	function (a, b) {
@@ -10863,9 +10863,16 @@ var _user$project$Models$QueryResponse = F2(
 var _user$project$Models$SchemaColumn = function (a) {
 	return {name: a};
 };
-var _user$project$Models$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {loading: a, route: b, sidebarOpen: c, ignoreKeyEvents: d, queryResponse: e, error: f};
+var _user$project$Models$Structure = function (a) {
+	return {databases: a};
+};
+var _user$project$Models$DatabaseSchema = F4(
+	function (a, b, c, d) {
+		return {name: a, kind: b, tables: c, views: d};
+	});
+var _user$project$Models$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {loading: a, route: b, sidebarOpen: c, ignoreKeyEvents: d, structure: e, selectedDatabase: f, queryString: g, queryResponse: h, error: i};
 	});
 var _user$project$Models$Home = {ctor: 'Home'};
 
@@ -10875,6 +10882,12 @@ var _user$project$Msgs$OnQueryResponse = function (a) {
 var _user$project$Msgs$RunQuery = {ctor: 'RunQuery'};
 var _user$project$Msgs$OnFocusQuery = function (a) {
 	return {ctor: 'OnFocusQuery', _0: a};
+};
+var _user$project$Msgs$OnUpdateQueryString = function (a) {
+	return {ctor: 'OnUpdateQueryString', _0: a};
+};
+var _user$project$Msgs$OnFetchDatabasesResponse = function (a) {
+	return {ctor: 'OnFetchDatabasesResponse', _0: a};
 };
 var _user$project$Msgs$FocusQuery = {ctor: 'FocusQuery'};
 var _user$project$Msgs$SetIgnoreKeyEvent = function (a) {
@@ -10887,6 +10900,37 @@ var _user$project$Msgs$OnLocationChange = function (a) {
 	return {ctor: 'OnLocationChange', _0: a};
 };
 var _user$project$Msgs$ToggleSidebar = {ctor: 'ToggleSidebar'};
+
+var _user$project$Commands_Databases$databaseDecoder = A4(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+	'views',
+	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+	{ctor: '[]'},
+	A4(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+		'tables',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+		{ctor: '[]'},
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'kind',
+			_elm_lang$core$Json_Decode$string,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+				'name',
+				_elm_lang$core$Json_Decode$string,
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Models$DatabaseSchema)))));
+var _user$project$Commands_Databases$structureDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'data',
+	_elm_lang$core$Json_Decode$list(_user$project$Commands_Databases$databaseDecoder),
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Models$Structure));
+var _user$project$Commands_Databases$structureUrl = '/static/dummyDatabasesData.json';
+var _user$project$Commands_Databases$fetchStructure = A2(
+	_elm_lang$core$Platform_Cmd$map,
+	_user$project$Msgs$OnFetchDatabasesResponse,
+	_krisajenkins$remotedata$RemoteData$sendRequest(
+		A2(_elm_lang$http$Http$get, _user$project$Commands_Databases$structureUrl, _user$project$Commands_Databases$structureDecoder)));
 
 var _user$project$Commands_Query$valuesDecoder = _elm_lang$core$Json_Decode$list(
 	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string));
@@ -10921,13 +10965,21 @@ var _user$project$Commands_Query$queryDecoder = A3(
 		},
 		_user$project$Commands_Query$schemaDecoder,
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Models$QueryResponse)));
-var _user$project$Commands_Query$queryUrl = '/static/dummyData.json';
-var _user$project$Commands_Query$runQuery = function (_p0) {
+var _user$project$Commands_Query$queryUrl = function (query) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'/static/dummyQueryData.json?q=',
+		_elm_lang$http$Http$encodeUri(query));
+};
+var _user$project$Commands_Query$runQuery = function (query) {
 	return A2(
 		_elm_lang$core$Platform_Cmd$map,
 		_user$project$Msgs$OnQueryResponse,
 		_krisajenkins$remotedata$RemoteData$sendRequest(
-			A2(_elm_lang$http$Http$get, _user$project$Commands_Query$queryUrl, _user$project$Commands_Query$queryDecoder)));
+			A2(
+				_elm_lang$http$Http$get,
+				_user$project$Commands_Query$queryUrl(query),
+				_user$project$Commands_Query$queryDecoder)));
 };
 
 var _user$project$Routing$parseLocation = function (location) {
@@ -11002,6 +11054,14 @@ var _user$project$Update$update = F2(
 						{ignoreKeyEvents: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'OnFetchDatabasesResponse':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{structure: _p1._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'FocusQuery':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
@@ -11014,6 +11074,14 @@ var _user$project$Update$update = F2(
 							_elm_lang$dom$Dom$focus('query')),
 						_1: {ctor: '[]'}
 					});
+			case 'OnUpdateQueryString':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{queryString: _p1._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'OnFocusQuery':
 				var _p2 = _p1._0;
 				if (_p2.ctor === 'Err') {
@@ -11040,7 +11108,7 @@ var _user$project$Update$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{queryResponse: _krisajenkins$remotedata$RemoteData$Loading, loading: model.loading + 1}),
-					_1: _user$project$Commands_Query$runQuery('hej!')
+					_1: _user$project$Commands_Query$runQuery(model.queryString)
 				};
 			default:
 				return {
@@ -11053,19 +11121,117 @@ var _user$project$Update$update = F2(
 		}
 	});
 
-var _user$project$View_Sidebar$sidebar = function (model) {
+var _user$project$Utils_List$nth = F2(
+	function (n, xs) {
+		nth:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.cmp(n, 0) < 0) {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				var _p0 = {ctor: '_Tuple2', _0: xs, _1: n};
+				if (_p0._0.ctor === '[]') {
+					return _elm_lang$core$Maybe$Nothing;
+				} else {
+					if (_p0._1 === 0) {
+						return _elm_lang$core$Maybe$Just(_p0._0._0);
+					} else {
+						var _v1 = _p0._1 - 1,
+							_v2 = _p0._0._1;
+						n = _v1;
+						xs = _v2;
+						continue nth;
+					}
+				}
+			}
+		}
+	});
+
+var _user$project$View_Sidebar$databaseSelector = function (dbs) {
 	return A2(
-		_elm_lang$html$Html$div,
+		_elm_lang$html$Html$select,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+			_0: _elm_lang$html$Html_Attributes$disabled(
+				_elm_lang$core$List$isEmpty(dbs)),
 			_1: {ctor: '[]'}
 		},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Sidebar here'),
-			_1: {ctor: '[]'}
-		});
+		A2(
+			_elm_lang$core$List$indexedMap,
+			F2(
+				function (idx, db) {
+					return A2(
+						_elm_lang$html$Html$option,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(
+								_elm_lang$core$Basics$toString(idx)),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(db.name),
+							_1: {ctor: '[]'}
+						});
+				}),
+			dbs));
+};
+var _user$project$View_Sidebar$sidebar = function (model) {
+	var _p0 = model.structure;
+	switch (_p0.ctor) {
+		case 'NotAsked':
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(''),
+					_1: {ctor: '[]'}
+				});
+		case 'Loading':
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Loading...'),
+					_1: {ctor: '[]'}
+				});
+		case 'Failure':
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(
+						_elm_lang$core$Basics$toString(_p0._0)),
+					_1: {ctor: '[]'}
+				});
+		default:
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _user$project$View_Sidebar$databaseSelector(_p0._0.databases),
+					_1: {ctor: '[]'}
+				});
+	}
 };
 
 var _user$project$View_Query$col = function (c) {
@@ -11176,36 +11342,13 @@ var _user$project$View$view = function (model) {
 					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$button,
+							_elm_lang$html$Html$div,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(_user$project$Msgs$ToggleSidebar),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$title('Toggle the sidebar [t]'),
-									_1: {ctor: '[]'}
-								}
+								_0: _elm_lang$html$Html_Attributes$class('query-container'),
+								_1: {ctor: '[]'}
 							},
 							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Toggle sidebar [t]'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											'Sidebar open: ',
-											_elm_lang$core$Basics$toString(model.sidebarOpen))),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
 								ctor: '::',
 								_0: A2(
 									_elm_lang$html$Html$textarea,
@@ -11214,13 +11357,25 @@ var _user$project$View$view = function (model) {
 										_0: _elm_lang$html$Html_Attributes$id('query'),
 										_1: {
 											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onFocus(
-												_user$project$Msgs$SetIgnoreKeyEvent(true)),
+											_0: _elm_lang$html$Html_Attributes$value(model.queryString),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onBlur(
-													_user$project$Msgs$SetIgnoreKeyEvent(false)),
-												_1: {ctor: '[]'}
+												_0: _elm_lang$html$Html_Events$onInput(_user$project$Msgs$OnUpdateQueryString),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onFocus(
+														_user$project$Msgs$SetIgnoreKeyEvent(true)),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onBlur(
+															_user$project$Msgs$SetIgnoreKeyEvent(false)),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$placeholder('Press \"q\" to jump to this field'),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
 											}
 										}
 									},
@@ -11228,57 +11383,39 @@ var _user$project$View$view = function (model) {
 								_1: {
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$br,
-										{ctor: '[]'},
-										{ctor: '[]'}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$button,
-											{
+										_elm_lang$html$Html$button,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('run-query-button'),
+											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Events$onClick(_user$project$Msgs$RunQuery),
 												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Run query'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$div,
-												{ctor: '[]'},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text(
-														A2(
-															_elm_lang$core$Basics_ops['++'],
-															'Ignore key events: ',
-															_elm_lang$core$Basics$toString(model.ignoreKeyEvents))),
-													_1: {ctor: '[]'}
-												}),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Press \"q\" to focus on query field'),
-												_1: {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$hr,
-														{ctor: '[]'},
-														{ctor: '[]'}),
-													_1: {
-														ctor: '::',
-														_0: _user$project$View_Query$query(model.queryResponse),
-														_1: {ctor: '[]'}
-													}
-												}
 											}
-										}
-									}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Run query'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
 								}
-							}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('query-result-container'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _user$project$View_Query$query(model.queryResponse),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
 						}
 					}),
 				_1: {ctor: '[]'}
@@ -11428,7 +11565,7 @@ var _user$project$Main$init = function (location) {
 	return {
 		ctor: '_Tuple2',
 		_0: _user$project$Models$initialModel(currentRoute),
-		_1: _elm_lang$core$Platform_Cmd$none
+		_1: _user$project$Commands_Databases$fetchStructure
 	};
 };
 var _user$project$Main$subscriptions = function (model) {
