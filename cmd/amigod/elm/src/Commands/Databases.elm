@@ -1,36 +1,27 @@
-module Commands.Databases exposing (fetchStructure)
+module Commands.Databases exposing (fetchDatabaseServer)
 
 import Http
 import Json.Encode
 import Json.Decode exposing (Decoder, list, string)
-import Json.Decode.Pipeline exposing (decode, required, optional)
+import Json.Decode.Pipeline exposing (decode, requiredAt)
 import Msgs exposing (Msg)
-import Models exposing (DatabaseSchema, Structure)
+import Models exposing (DatabaseServer)
 import RemoteData
 
 
-fetchStructure : Cmd Msg
-fetchStructure =
-    Http.get structureUrl structureDecoder
+fetchDatabaseServer : Cmd Msg
+fetchDatabaseServer =
+    Http.get databaseServerUrl databaseServerDecoder
         |> RemoteData.sendRequest
-        |> Cmd.map Msgs.OnFetchDatabasesResponse
+        |> Cmd.map Msgs.OnFetchDatabaseServerResponse
 
 
-structureUrl : String
-structureUrl =
+databaseServerUrl : String
+databaseServerUrl =
     "/static/dummyDatabasesData.json"
 
 
-structureDecoder : Decoder Structure
-structureDecoder =
-    decode Structure
-        |> required "data" (list databaseDecoder)
-
-
-databaseDecoder : Decoder DatabaseSchema
-databaseDecoder =
-    decode DatabaseSchema
-        |> required "name" string
-        |> required "kind" string
-        |> optional "tables" (list string) []
-        |> optional "views" (list string) []
+databaseServerDecoder : Decoder DatabaseServer
+databaseServerDecoder =
+    decode DatabaseServer
+        |> requiredAt [ "data", "databases" ] (list string)

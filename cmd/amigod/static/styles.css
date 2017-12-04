@@ -48,11 +48,6 @@ td {
     width: 300px;
     overflow-y: auto;
     transition: .2s;
-    margin-left: -320px;
-}
-
-[data-sidebar="open"] .sidebar {
-    margin-left: 0;
 }
 
 .content {

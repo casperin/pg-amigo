@@ -4,13 +4,13 @@ import Utils.List exposing (nth)
 import Html exposing (Html, button, div, text, ul, li, select, option)
 import Html.Attributes exposing (class, value, disabled)
 import Msgs exposing (Msg)
-import Models exposing (Model, DatabaseSchema, Structure)
+import Models exposing (Model)
 import RemoteData exposing (WebData)
 
 
 sidebar : Model -> Html Msg
 sidebar model =
-    case model.structure of
+    case model.databaseServer of
         RemoteData.NotAsked ->
             div [ class "sidebar" ] [ text "" ]
 
@@ -20,16 +20,16 @@ sidebar model =
         RemoteData.Failure err ->
             div [ class "sidebar" ] [ text <| toString err ]
 
-        RemoteData.Success struc ->
+        RemoteData.Success databaseServer ->
             div [ class "sidebar" ]
-                [ databaseSelector struc.databases
+                [ databaseSelector databaseServer.databases
                 ]
 
 
-databaseSelector : List DatabaseSchema -> Html Msg
+databaseSelector : List String -> Html Msg
 databaseSelector dbs =
     select [ disabled (List.isEmpty dbs) ]
-        (List.indexedMap
-            (\idx db -> option [ value (toString idx) ] [ text db.name ])
+        (List.map
+            (\db -> option [ value db ] [ text db ])
             dbs
         )

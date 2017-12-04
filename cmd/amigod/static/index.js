@@ -10854,7 +10854,7 @@ var _krisajenkins$remotedata$RemoteData$update = F2(
 	});
 
 var _user$project$Models$initialModel = function (route) {
-	return {loading: 0, route: route, sidebarOpen: true, ignoreKeyEvents: false, structure: _krisajenkins$remotedata$RemoteData$Loading, selectedDatabase: 0, queryString: '', queryResponse: _krisajenkins$remotedata$RemoteData$NotAsked, error: _elm_lang$core$Maybe$Nothing};
+	return {loading: 0, route: route, ignoreKeyEvents: false, databaseServer: _krisajenkins$remotedata$RemoteData$Loading, selectedDatabase: _elm_lang$core$Maybe$Nothing, queryString: '', queryResponse: _krisajenkins$remotedata$RemoteData$NotAsked, error: _elm_lang$core$Maybe$Nothing};
 };
 var _user$project$Models$QueryResponse = F2(
 	function (a, b) {
@@ -10863,16 +10863,12 @@ var _user$project$Models$QueryResponse = F2(
 var _user$project$Models$SchemaColumn = function (a) {
 	return {name: a};
 };
-var _user$project$Models$Structure = function (a) {
+var _user$project$Models$DatabaseServer = function (a) {
 	return {databases: a};
 };
-var _user$project$Models$DatabaseSchema = F4(
-	function (a, b, c, d) {
-		return {name: a, kind: b, tables: c, views: d};
-	});
-var _user$project$Models$Model = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {loading: a, route: b, sidebarOpen: c, ignoreKeyEvents: d, structure: e, selectedDatabase: f, queryString: g, queryResponse: h, error: i};
+var _user$project$Models$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {loading: a, route: b, ignoreKeyEvents: c, databaseServer: d, selectedDatabase: e, queryString: f, queryResponse: g, error: h};
 	});
 var _user$project$Models$Home = {ctor: 'Home'};
 
@@ -10886,10 +10882,10 @@ var _user$project$Msgs$OnFocusQuery = function (a) {
 var _user$project$Msgs$OnUpdateQueryString = function (a) {
 	return {ctor: 'OnUpdateQueryString', _0: a};
 };
-var _user$project$Msgs$OnFetchDatabasesResponse = function (a) {
-	return {ctor: 'OnFetchDatabasesResponse', _0: a};
-};
 var _user$project$Msgs$FocusQuery = {ctor: 'FocusQuery'};
+var _user$project$Msgs$OnFetchDatabaseServerResponse = function (a) {
+	return {ctor: 'OnFetchDatabaseServerResponse', _0: a};
+};
 var _user$project$Msgs$SetIgnoreKeyEvent = function (a) {
 	return {ctor: 'SetIgnoreKeyEvent', _0: a};
 };
@@ -10899,38 +10895,26 @@ var _user$project$Msgs$HandleKeyboardEvent = function (a) {
 var _user$project$Msgs$OnLocationChange = function (a) {
 	return {ctor: 'OnLocationChange', _0: a};
 };
-var _user$project$Msgs$ToggleSidebar = {ctor: 'ToggleSidebar'};
 
-var _user$project$Commands_Databases$databaseDecoder = A4(
-	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
-	'views',
+var _user$project$Commands_Databases$databaseServerDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt,
+	{
+		ctor: '::',
+		_0: 'data',
+		_1: {
+			ctor: '::',
+			_0: 'databases',
+			_1: {ctor: '[]'}
+		}
+	},
 	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
-	{ctor: '[]'},
-	A4(
-		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
-		'tables',
-		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
-		{ctor: '[]'},
-		A3(
-			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-			'kind',
-			_elm_lang$core$Json_Decode$string,
-			A3(
-				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-				'name',
-				_elm_lang$core$Json_Decode$string,
-				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Models$DatabaseSchema)))));
-var _user$project$Commands_Databases$structureDecoder = A3(
-	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-	'data',
-	_elm_lang$core$Json_Decode$list(_user$project$Commands_Databases$databaseDecoder),
-	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Models$Structure));
-var _user$project$Commands_Databases$structureUrl = '/static/dummyDatabasesData.json';
-var _user$project$Commands_Databases$fetchStructure = A2(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Models$DatabaseServer));
+var _user$project$Commands_Databases$databaseServerUrl = '/static/dummyDatabasesData.json';
+var _user$project$Commands_Databases$fetchDatabaseServer = A2(
 	_elm_lang$core$Platform_Cmd$map,
-	_user$project$Msgs$OnFetchDatabasesResponse,
+	_user$project$Msgs$OnFetchDatabaseServerResponse,
 	_krisajenkins$remotedata$RemoteData$sendRequest(
-		A2(_elm_lang$http$Http$get, _user$project$Commands_Databases$structureUrl, _user$project$Commands_Databases$structureDecoder)));
+		A2(_elm_lang$http$Http$get, _user$project$Commands_Databases$databaseServerUrl, _user$project$Commands_Databases$databaseServerDecoder)));
 
 var _user$project$Commands_Query$valuesDecoder = _elm_lang$core$Json_Decode$list(
 	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string));
@@ -10989,51 +10973,26 @@ var _user$project$Routing$parseLocation = function (location) {
 var _user$project$Update$handleKeyEvent = F2(
 	function (event, model) {
 		var _p0 = event.key;
-		_v0_2:
-		do {
-			if (_p0.ctor === 'Just') {
-				switch (_p0._0) {
-					case 't':
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{sidebarOpen: !model.sidebarOpen}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					case 'q':
-						return A2(
-							_elm_lang$core$Platform_Cmd_ops['!'],
-							model,
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$core$Task$attempt,
-									_user$project$Msgs$OnFocusQuery,
-									_elm_lang$dom$Dom$focus('query')),
-								_1: {ctor: '[]'}
-							});
-					default:
-						break _v0_2;
-				}
-			} else {
-				break _v0_2;
-			}
-		} while(false);
-		return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		if ((_p0.ctor === 'Just') && (_p0._0 === 'q')) {
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				model,
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$core$Task$attempt,
+						_user$project$Msgs$OnFocusQuery,
+						_elm_lang$dom$Dom$focus('query')),
+					_1: {ctor: '[]'}
+				});
+		} else {
+			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		}
 	});
 var _user$project$Update$update = F2(
 	function (msg, model) {
 		var _p1 = msg;
 		switch (_p1.ctor) {
-			case 'ToggleSidebar':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{sidebarOpen: !model.sidebarOpen}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
 			case 'OnLocationChange':
 				return {
 					ctor: '_Tuple2',
@@ -11054,12 +11013,12 @@ var _user$project$Update$update = F2(
 						{ignoreKeyEvents: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'OnFetchDatabasesResponse':
+			case 'OnFetchDatabaseServerResponse':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{structure: _p1._0}),
+						{databaseServer: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'FocusQuery':
@@ -11156,27 +11115,25 @@ var _user$project$View_Sidebar$databaseSelector = function (dbs) {
 			_1: {ctor: '[]'}
 		},
 		A2(
-			_elm_lang$core$List$indexedMap,
-			F2(
-				function (idx, db) {
-					return A2(
-						_elm_lang$html$Html$option,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$value(
-								_elm_lang$core$Basics$toString(idx)),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(db.name),
-							_1: {ctor: '[]'}
-						});
-				}),
+			_elm_lang$core$List$map,
+			function (db) {
+				return A2(
+					_elm_lang$html$Html$option,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$value(db),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(db),
+						_1: {ctor: '[]'}
+					});
+			},
 			dbs));
 };
 var _user$project$View_Sidebar$sidebar = function (model) {
-	var _p0 = model.structure;
+	var _p0 = model.databaseServer;
 	switch (_p0.ctor) {
 		case 'NotAsked':
 			return A2(
@@ -11307,25 +11264,13 @@ var _user$project$View_Query$query = function (resp) {
 	}
 };
 
-var _user$project$Utils_String$tern = F3(
-	function (x, a, b) {
-		return x ? a : b;
-	});
-
 var _user$project$View$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Attributes$class('app'),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html_Attributes$attribute,
-					'data-sidebar',
-					A3(_user$project$Utils_String$tern, model.sidebarOpen, 'open', 'closed')),
-				_1: {ctor: '[]'}
-			}
+			_1: {ctor: '[]'}
 		},
 		{
 			ctor: '::',
@@ -11565,7 +11510,7 @@ var _user$project$Main$init = function (location) {
 	return {
 		ctor: '_Tuple2',
 		_0: _user$project$Models$initialModel(currentRoute),
-		_1: _user$project$Commands_Databases$fetchStructure
+		_1: _user$project$Commands_Databases$fetchDatabaseServer
 	};
 };
 var _user$project$Main$subscriptions = function (model) {

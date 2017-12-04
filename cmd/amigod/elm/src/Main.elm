@@ -5,7 +5,7 @@ import Update exposing (update)
 import Models exposing (initialModel, Model)
 import View exposing (view)
 import Msgs exposing (Msg)
-import Commands.Databases exposing (fetchStructure)
+import Commands.Databases exposing (fetchDatabaseServer)
 import Navigation exposing (Location)
 import Routing
 import Json.Decode as Json
@@ -33,4 +33,4 @@ init location =
         currentRoute =
             Routing.parseLocation location
     in
-        ( initialModel currentRoute, fetchStructure )
+        ( initialModel currentRoute, fetchDatabaseServer )

@@ -13,9 +13,6 @@ import Task
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ToggleSidebar ->
-            ( { model | sidebarOpen = not model.sidebarOpen }, Cmd.none )
-
         OnLocationChange location ->
             ( { model | route = parseLocation location }, Cmd.none )
 
@@ -28,8 +25,8 @@ update msg model =
         SetIgnoreKeyEvent ignore ->
             ( { model | ignoreKeyEvents = ignore }, Cmd.none )
 
-        OnFetchDatabasesResponse resp ->
-            ( { model | structure = resp }, Cmd.none )
+        OnFetchDatabaseServerResponse resp ->
+            ( { model | databaseServer = resp }, Cmd.none )
 
         FocusQuery ->
             model ! [ Task.attempt OnFocusQuery (focus "query") ]
@@ -55,9 +52,6 @@ update msg model =
 handleKeyEvent : KeyboardEvent -> Model -> ( Model, Cmd Msg )
 handleKeyEvent event model =
     case event.key of
-        Just "t" ->
-            ( { model | sidebarOpen = not model.sidebarOpen }, Cmd.none )
-
         Just "q" ->
             model ! [ Task.attempt OnFocusQuery (focus "query") ]
 

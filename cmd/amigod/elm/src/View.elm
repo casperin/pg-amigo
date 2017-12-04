@@ -4,15 +4,14 @@ import Html exposing (Html, button, input, div, text, textarea, hr, br)
 import Html.Attributes exposing (id, class, attribute, title, value, placeholder)
 import Html.Events exposing (onClick, onFocus, onBlur, onInput)
 import Models exposing (Model)
-import Msgs exposing (Msg(ToggleSidebar, SetIgnoreKeyEvent, RunQuery, OnUpdateQueryString))
+import Msgs exposing (Msg(SetIgnoreKeyEvent, RunQuery, OnUpdateQueryString))
 import View.Sidebar exposing (sidebar)
 import View.Query exposing (query)
-import Utils.String exposing (tern)
 
 
 view : Model -> Html Msg
 view model =
-    div [ class "app", attribute "data-sidebar" (tern model.sidebarOpen "open" "closed") ]
+    div [ class "app" ]
         [ sidebar model
         , div [ class "content" ]
             [ div [ class "query-container" ]

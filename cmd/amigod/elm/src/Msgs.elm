@@ -2,19 +2,18 @@ module Msgs exposing (..)
 
 import Navigation exposing (Location)
 import Keyboard.Event exposing (KeyboardEvent)
-import Models exposing (QueryResponse, Structure)
+import Models exposing (QueryResponse, DatabaseServer)
 import Dom
 import RemoteData exposing (WebData)
 import Http
 
 
 type Msg
-    = ToggleSidebar
-    | OnLocationChange Location
+    = OnLocationChange Location
     | HandleKeyboardEvent KeyboardEvent
     | SetIgnoreKeyEvent Bool
+    | OnFetchDatabaseServerResponse (WebData DatabaseServer)
     | FocusQuery
-    | OnFetchDatabasesResponse (WebData Structure)
     | OnUpdateQueryString String
     | OnFocusQuery (Result Dom.Error ())
     | RunQuery
