@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/casperin/pg-amigo/internal/connection"
@@ -12,11 +13,11 @@ type queryResponse struct {
 }
 
 type queryResponseData struct {
-	Schema []queryResponseDataSchema `json:"schema"`
-	Values [][]string                `json:"values"`
+	Schema []queryResponseColumn `json:"schema"`
+	Values [][]string            `json:"values"`
 }
 
-type queryResponseDataSchema struct {
+type queryResponseColumn struct {
 	Name string `json:"name"`
 }
 
@@ -25,9 +26,41 @@ func Query(w http.ResponseWriter, r *http.Request) {
 	q := r.FormValue("q")
 	conn := connection.New(dbName)
 	columns, result, err := connection.QueryDB(conn, q)
-	data := struct {
-		Columns []string        `json:"columns"`
-		Rows    [][]interface{} `json:"rows"`
-	}{columns, result}
-	serveAsJsonOrError(w, data, err)
+
+	response := queryResponse{
+		queryResponseData{
+			toQueryResponseColumns(columns),
+			toStrings(result),
+		},
+	}
+
+	serveAsJsonOrError(w, response, err)
+}
+
+func toQueryResponseColumns(names []string) []queryResponseColumn {
+	result := []queryResponseColumn{}
+	for _, name := range names {
+		result = append(result, queryResponseColumn{name})
+	}
+
+	return result
+}
+
+func toStrings(values [][]interface{}) [][]string {
+	result := [][]string{}
+	for _, vals := range values {
+		rs := []string{}
+		for _, val := range vals {
+			_val, ok := val.(*interface{})
+			if ok {
+				rs = append(rs, fmt.Sprint(*_val))
+			} else {
+				rs = append(rs, "")
+			}
+		}
+
+		result = append(result, rs)
+	}
+
+	return result
 }

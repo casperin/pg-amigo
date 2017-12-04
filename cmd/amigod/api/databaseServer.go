@@ -6,6 +6,14 @@ import (
 	"github.com/casperin/pg-amigo/internal/connection"
 )
 
+type databaseServerResponseData struct {
+	Databases []string `json:"databases"`
+}
+
+type databaseServerResponse struct {
+	Data databaseServerResponseData `json:"data"`
+}
+
 func DatabaseServer(w http.ResponseWriter, r *http.Request) {
 	db := connection.Pg()
 	dbs, err := connection.GetDatabaseNames(db)
@@ -14,13 +22,7 @@ func DatabaseServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	type responseData struct {
-		Databases []string `json:"databases"`
-	}
-	type response struct {
-		Data responseData `json:"data"`
-	}
-	resp := response{responseData{dbs}}
+	resp := databaseServerResponse{databaseServerResponseData{dbs}}
 
 	serveAsJSON(w, resp)
 }
