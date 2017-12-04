@@ -34,17 +34,14 @@ func main() {
 
 	r.Route("/", func(r chi.Router) {
 		r.Use(middleware.MustBeLoggedIn)
-		r.Get("/", handlers.Index)
-
-		r.Get("/db/{db}", handlers.Database)
-		r.Post("/db/new", handlers.NewDatabase)
-		r.Post("/db/delete", handlers.DeleteDatabase)
-		r.Get("/query/{db}", handlers.QueryDB)
+		r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, filepath.Join(staticPath, "elm.html"))
+		})
 	})
 
 	r.Route("/api", func(r chi.Router) {
 		r.Use(middleware.MustBeLoggedIn)
-		r.Get("/databases", api.Databases)
+		r.Get("/database-server", api.DatabaseServer)
 		r.Get("/query/{db}", api.Query)
 	})
 
