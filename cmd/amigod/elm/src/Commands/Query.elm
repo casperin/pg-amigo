@@ -1,5 +1,6 @@
 module Commands.Query exposing (runQuery)
 
+import Routing
 import Http
 import Json.Encode
 import Json.Decode exposing (Decoder, at, list, string)
@@ -9,16 +10,19 @@ import Models exposing (QueryResponse, SchemaColumn)
 import RemoteData
 
 
-runQuery : String -> Cmd Msg
-runQuery query =
-    Http.get (queryUrl query) queryDecoder
+runQuery : String -> Models.Model -> Cmd Msg
+runQuery query model =
+    Http.get (queryUrl query model) queryDecoder
         |> RemoteData.sendRequest
         |> Cmd.map Msgs.OnQueryResponse
 
 
-queryUrl : String -> String
-queryUrl query =
-    "/static/dummyQueryData.json?q=" ++ (Http.encodeUri query)
+queryUrl : String -> Models.Model -> String
+queryUrl query model =
+    "/api/query/"
+        ++ (Routing.getDatabase model)
+        ++ "?q="
+        ++ (Http.encodeUri query)
 
 
 queryDecoder : Decoder QueryResponse

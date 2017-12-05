@@ -9,14 +9,14 @@ import Html.Attributes exposing (class, autofocus, value, id)
 import Html.Events exposing (onClick, onFocus, onBlur, onInput)
 
 
-query : Model -> Html Msg
-query model =
+query : String -> WebData QueryResponse -> Html Msg
+query queryString queryResponse =
     div [ class "query-page" ]
         [ div [ class "query-container" ]
             [ textarea
                 [ id "query"
                 , autofocus True
-                , value model.queryString
+                , value queryString
                 , onInput OnUpdateQueryString
                 , onFocus (SetIgnoreKeyEvent True)
                 , onBlur (SetIgnoreKeyEvent False)
@@ -26,12 +26,12 @@ query model =
             ]
         , hr [] []
         , div [ class "query-result-container" ]
-            [ queryResponse model.queryResponse ]
+            [ renderQueryTable queryResponse ]
         ]
 
 
-queryResponse : WebData QueryResponse -> Html Msg
-queryResponse resp =
+renderQueryTable : WebData QueryResponse -> Html Msg
+renderQueryTable resp =
     case resp of
         RemoteData.NotAsked ->
             text "No query"

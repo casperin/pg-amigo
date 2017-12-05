@@ -24,6 +24,7 @@ type queryResponseColumn struct {
 func Query(w http.ResponseWriter, r *http.Request) {
 	dbName := chi.URLParam(r, "db")
 	q := r.FormValue("q")
+	fmt.Println(dbName, q)
 	conn := connection.New(dbName)
 	columns, result, err := connection.QueryDB(conn, q)
 

@@ -22,7 +22,7 @@ tr.labels td {
 }
 td {
     padding: .1em .3em;
-    border: 1px dashed #888;
+    border: 1px solid #aaa;
 }
 
 .error {

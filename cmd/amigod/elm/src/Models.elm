@@ -5,8 +5,17 @@ import RemoteData exposing (WebData)
 
 type Route
     = Home
-    | Query
-    | Tables
+    | Query Database
+    | Tables Database
+
+
+type SimpleRoute
+    = SQuery
+    | STables
+
+
+type alias Database =
+    String
 
 
 type alias QueryResponse =
@@ -16,8 +25,7 @@ type alias QueryResponse =
 
 
 type alias SchemaColumn =
-    { name : String
-    }
+    { name : String }
 
 
 type alias DatabaseServer =
@@ -29,7 +37,6 @@ type alias Model =
     , route : Route
     , ignoreKeyEvents : Bool
     , databaseServer : WebData DatabaseServer
-    , selectedDatabase : Maybe String
     , queryString : String
     , queryResponse : WebData QueryResponse
     , error : Maybe String
@@ -42,7 +49,6 @@ initialModel route =
     , route = route
     , ignoreKeyEvents = False
     , databaseServer = RemoteData.Loading
-    , selectedDatabase = Nothing
     , queryString = ""
     , queryResponse = RemoteData.NotAsked
     , error = Nothing

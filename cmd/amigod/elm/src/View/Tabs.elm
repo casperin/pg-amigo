@@ -3,12 +3,14 @@ module View.Tabs exposing (..)
 import Utils.String exposing (tern)
 import Html exposing (Html, button, div, text, ul, li, select, option, a)
 import Html.Attributes exposing (class, value, disabled, href)
-import Msgs exposing (Msg)
-import Models exposing (Model, Route(Query, Tables))
+import Html.Events as Events
+import Msgs
+import Models exposing (Model, Route(Query, Tables), SimpleRoute(SQuery, STables))
 import RemoteData exposing (WebData)
+import Routing
 
 
-tabs : Model -> Html Msg
+tabs : Model -> Html Msgs.Msg
 tabs model =
     case model.databaseServer of
         RemoteData.NotAsked ->
@@ -22,26 +24,24 @@ tabs model =
 
         RemoteData.Success databaseServer ->
             div [ class "tabs" ]
-                [ databaseSelector databaseServer.databases
-                , a
-                    [ href "#tables"
-                    , class <| tern (model.route == Tables) "current" ""
+                [ div [ class "database-selector" ]
+                    [ select
+                        [ disabled (List.isEmpty databaseServer.databases)
+                        , Events.onInput Msgs.OnUpdateDatabase
+                        ]
+                        (List.map
+                            (\db -> option [ value db ] [ text db ])
+                            databaseServer.databases
+                        )
                     ]
-                    [ text "Tables" ]
                 , a
-                    [ href "#query"
-                    , class <| tern (model.route == Query) "current" ""
+                    [ href <| Routing.routeToUrl SQuery model
+                    , class <| tern (Routing.isRoute SQuery model) "current" ""
                     ]
                     [ text "Query" ]
+                , a
+                    [ href <| Routing.routeToUrl STables model
+                    , class <| tern (Routing.isRoute STables model) "current" ""
+                    ]
+                    [ text "Tables" ]
                 ]
-
-
-databaseSelector : List String -> Html Msg
-databaseSelector dbs =
-    div [ class "database-selector" ]
-        [ select [ disabled (List.isEmpty dbs) ]
-            (List.map
-                (\db -> option [ value db ] [ text db ])
-                dbs
-            )
-        ]

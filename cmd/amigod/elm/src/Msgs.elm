@@ -13,6 +13,7 @@ type Msg
     | HandleKeyboardEvent KeyboardEvent
     | SetIgnoreKeyEvent Bool
     | OnFetchDatabaseServerResponse (WebData DatabaseServer)
+    | OnUpdateDatabase Models.Database
     | FocusQuery
     | OnUpdateQueryString String
     | OnFocusQuery (Result Dom.Error ())

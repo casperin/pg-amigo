@@ -22,8 +22,8 @@ page model =
         Home ->
             text ""
 
-        Query ->
-            query model
+        Query database ->
+            query model.queryString model.queryResponse
 
-        Tables ->
-            h1 [] [ text "tables" ]
+        Tables database ->
+            h1 [] [ text <| "tables: " ++ database ]
