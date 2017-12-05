@@ -11123,6 +11123,7 @@ var _user$project$Models$Model = F8(
 	});
 var _user$project$Models$Tables = {ctor: 'Tables'};
 var _user$project$Models$Query = {ctor: 'Query'};
+var _user$project$Models$Home = {ctor: 'Home'};
 
 var _user$project$Msgs$OnQueryResponse = function (a) {
 	return {ctor: 'OnQueryResponse', _0: a};
@@ -11221,7 +11222,7 @@ var _user$project$Commands_Query$runQuery = function (query) {
 var _user$project$Routing$matchers = _evancz$url_parser$UrlParser$oneOf(
 	{
 		ctor: '::',
-		_0: A2(_evancz$url_parser$UrlParser$map, _user$project$Models$Query, _evancz$url_parser$UrlParser$top),
+		_0: A2(_evancz$url_parser$UrlParser$map, _user$project$Models$Home, _evancz$url_parser$UrlParser$top),
 		_1: {
 			ctor: '::',
 			_0: A2(
@@ -11243,61 +11244,66 @@ var _user$project$Routing$parseLocation = function (location) {
 	if (_p0.ctor === 'Just') {
 		return _p0._0;
 	} else {
-		return _user$project$Models$Query;
+		return _user$project$Models$Home;
 	}
 };
-
-var _user$project$Update$handleKeyEvent = F2(
-	function (event, model) {
-		var _p0 = event.key;
-		_v0_2:
-		do {
-			if (_p0.ctor === 'Just') {
-				switch (_p0._0) {
-					case 'q':
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{route: _user$project$Models$Query}),
-							_1: _elm_lang$navigation$Navigation$load('#query')
-						};
-					case 't':
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{route: _user$project$Models$Query}),
-							_1: _elm_lang$navigation$Navigation$load('#tables')
-						};
-					default:
-						break _v0_2;
-				}
-			} else {
-				break _v0_2;
+var _user$project$Routing$updateLocation = F2(
+	function (location, model) {
+		var route = _user$project$Routing$parseLocation(location);
+		var cmd = function () {
+			var _p1 = route;
+			switch (_p1.ctor) {
+				case 'Home':
+					return _elm_lang$navigation$Navigation$load('#query');
+				case 'Query':
+					return A2(
+						_elm_lang$core$Task$attempt,
+						_user$project$Msgs$OnFocusQuery,
+						_elm_lang$dom$Dom$focus('query'));
+				default:
+					return _elm_lang$core$Platform_Cmd$none;
 			}
-		} while(false);
-		return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		}();
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Native_Utils.update(
+				model,
+				{route: route}),
+			_1: cmd
+		};
 	});
+
+var _user$project$Update$handleKeyEvent = function (event) {
+	var _p0 = event.key;
+	_v0_2:
+	do {
+		if (_p0.ctor === 'Just') {
+			switch (_p0._0) {
+				case 'q':
+					return _elm_lang$navigation$Navigation$load('#query');
+				case 't':
+					return _elm_lang$navigation$Navigation$load('#tables');
+				default:
+					break _v0_2;
+			}
+		} else {
+			break _v0_2;
+		}
+	} while(false);
+	return _elm_lang$core$Platform_Cmd$none;
+};
 var _user$project$Update$update = F2(
 	function (msg, model) {
 		var _p1 = msg;
 		switch (_p1.ctor) {
 			case 'OnLocationChange':
-				var route = _user$project$Routing$parseLocation(_p1._0);
-				var cmd = _elm_lang$core$Native_Utils.eq(route, _user$project$Models$Query) ? A2(
-					_elm_lang$core$Task$attempt,
-					_user$project$Msgs$OnFocusQuery,
-					_elm_lang$dom$Dom$focus('query')) : _elm_lang$core$Platform_Cmd$none;
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{route: route}),
-					_1: cmd
-				};
+				return A2(_user$project$Routing$updateLocation, _p1._0, model);
 			case 'HandleKeyboardEvent':
-				return model.ignoreKeyEvents ? {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none} : A2(_user$project$Update$handleKeyEvent, _p1._0, model);
+				return model.ignoreKeyEvents ? {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none} : {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Update$handleKeyEvent(_p1._0)
+				};
 			case 'SetIgnoreKeyEvent':
 				return {
 					ctor: '_Tuple2',
@@ -11307,12 +11313,21 @@ var _user$project$Update$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'OnFetchDatabaseServerResponse':
+				var _p3 = _p1._0;
+				var cmd = function () {
+					var _p2 = _p3;
+					if (_p2.ctor === 'Success') {
+						return _elm_lang$navigation$Navigation$load('#tables');
+					} else {
+						return _elm_lang$core$Platform_Cmd$none;
+					}
+				}();
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{databaseServer: _p1._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
+						{databaseServer: _p3}),
+					_1: cmd
 				};
 			case 'FocusQuery':
 				return A2(
@@ -11335,15 +11350,15 @@ var _user$project$Update$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'OnFocusQuery':
-				var _p2 = _p1._0;
-				if (_p2.ctor === 'Err') {
+				var _p4 = _p1._0;
+				if (_p4.ctor === 'Err') {
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
 								error: _elm_lang$core$Maybe$Just(
-									A2(_elm_lang$core$Basics_ops['++'], 'Could not find dom id: ', _p2._0._0))
+									A2(_elm_lang$core$Basics_ops['++'], 'Could not find dom id: ', _p4._0._0))
 							}),
 						{ctor: '[]'});
 				} else {
@@ -11693,17 +11708,20 @@ var _user$project$View_Query$query = function (model) {
 
 var _user$project$View$page = function (model) {
 	var _p0 = model.route;
-	if (_p0.ctor === 'Query') {
-		return _user$project$View_Query$query(model);
-	} else {
-		return A2(
-			_elm_lang$html$Html$h1,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('tables'),
-				_1: {ctor: '[]'}
-			});
+	switch (_p0.ctor) {
+		case 'Home':
+			return _elm_lang$html$Html$text('');
+		case 'Query':
+			return _user$project$View_Query$query(model);
+		default:
+			return A2(
+				_elm_lang$html$Html$h1,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('tables'),
+					_1: {ctor: '[]'}
+				});
 	}
 };
 var _user$project$View$view = function (model) {
