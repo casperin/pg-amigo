@@ -39,6 +39,8 @@ type alias Model =
     , databaseServer : WebData DatabaseServer
     , queryString : String
     , queryResponse : WebData QueryResponse
+    , queryResponseOffset : Int
+    , queryResponseChunk : Int
     , error : Maybe String
     }
 
@@ -51,5 +53,7 @@ initialModel route =
     , databaseServer = RemoteData.Loading
     , queryString = ""
     , queryResponse = RemoteData.NotAsked
+    , queryResponseOffset = 0
+    , queryResponseChunk = 50
     , error = Nothing
     }

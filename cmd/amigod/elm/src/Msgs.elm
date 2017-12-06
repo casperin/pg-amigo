@@ -19,3 +19,4 @@ type Msg
     | OnFocusQuery (Result Dom.Error ())
     | RunQuery
     | OnQueryResponse (WebData QueryResponse)
+    | UpdateQueryOffset Int

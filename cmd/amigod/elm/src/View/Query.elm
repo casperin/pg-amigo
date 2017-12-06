@@ -4,19 +4,20 @@ import RemoteData exposing (WebData)
 import Models exposing (Model, QueryResponse, SchemaColumn)
 import Msgs exposing (Msg(SetIgnoreKeyEvent, RunQuery, OnUpdateQueryString))
 import Msgs exposing (Msg)
-import Html exposing (Html, text, div, hr, table, textarea, button, thead, tbody, tr, th, td)
-import Html.Attributes exposing (class, autofocus, value, id)
+import Html exposing (Html, text, div, table, textarea, button, thead, tbody, tr, th, td)
+import Html.Attributes exposing (class, autofocus, defaultValue, id)
 import Html.Events exposing (onClick, onFocus, onBlur, onInput)
+import View.QueryTable exposing (queryTable)
 
 
-query : String -> WebData QueryResponse -> Html Msg
-query queryString queryResponse =
+query : String -> Int -> Int -> WebData QueryResponse -> Html Msg
+query queryString queryOffset queryChunk queryResponse =
     div [ class "query-page" ]
         [ div [ class "query-container" ]
             [ textarea
                 [ id "query"
                 , autofocus True
-                , value queryString
+                , defaultValue queryString
                 , onInput OnUpdateQueryString
                 , onFocus (SetIgnoreKeyEvent True)
                 , onBlur (SetIgnoreKeyEvent False)
@@ -24,14 +25,13 @@ query queryString queryResponse =
                 []
             , button [ class "run-query-button", onClick RunQuery ] [ text "Run query" ]
             ]
-        , hr [] []
         , div [ class "query-result-container" ]
-            [ renderQueryTable queryResponse ]
+            [ renderQueryTable queryOffset queryChunk queryResponse ]
         ]
 
 
-renderQueryTable : WebData QueryResponse -> Html Msg
-renderQueryTable resp =
+renderQueryTable : Int -> Int -> WebData QueryResponse -> Html Msg
+renderQueryTable offset chunk resp =
     case resp of
         RemoteData.NotAsked ->
             text "No query"
@@ -43,32 +43,4 @@ renderQueryTable resp =
             text (toString error)
 
         RemoteData.Success data ->
-            table []
-                [ thead []
-                    [ tr [ class "labels" ]
-                        (List.map
-                            schema
-                            data.schema
-                        )
-                    ]
-                , tbody []
-                    (List.map
-                        row
-                        data.values
-                    )
-                ]
-
-
-schema : SchemaColumn -> Html Msg
-schema sc =
-    td [] [ text (.name sc) ]
-
-
-row : List String -> Html Msg
-row r =
-    tr [] (List.map col r)
-
-
-col : String -> Html Msg
-col c =
-    td [] [ text c ]
+            queryTable offset chunk data

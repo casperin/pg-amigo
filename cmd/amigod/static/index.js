@@ -11105,7 +11105,7 @@ var _krisajenkins$remotedata$RemoteData$update = F2(
 	});
 
 var _user$project$Models$initialModel = function (route) {
-	return {loading: 0, route: route, ignoreKeyEvents: false, databaseServer: _krisajenkins$remotedata$RemoteData$Loading, queryString: '', queryResponse: _krisajenkins$remotedata$RemoteData$NotAsked, error: _elm_lang$core$Maybe$Nothing};
+	return {loading: 0, route: route, ignoreKeyEvents: false, databaseServer: _krisajenkins$remotedata$RemoteData$Loading, queryString: '', queryResponse: _krisajenkins$remotedata$RemoteData$NotAsked, queryResponseOffset: 0, queryResponseChunk: 50, error: _elm_lang$core$Maybe$Nothing};
 };
 var _user$project$Models$QueryResponse = F2(
 	function (a, b) {
@@ -11117,9 +11117,9 @@ var _user$project$Models$SchemaColumn = function (a) {
 var _user$project$Models$DatabaseServer = function (a) {
 	return {databases: a};
 };
-var _user$project$Models$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {loading: a, route: b, ignoreKeyEvents: c, databaseServer: d, queryString: e, queryResponse: f, error: g};
+var _user$project$Models$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {loading: a, route: b, ignoreKeyEvents: c, databaseServer: d, queryString: e, queryResponse: f, queryResponseOffset: g, queryResponseChunk: h, error: i};
 	});
 var _user$project$Models$Tables = function (a) {
 	return {ctor: 'Tables', _0: a};
@@ -11131,6 +11131,9 @@ var _user$project$Models$Home = {ctor: 'Home'};
 var _user$project$Models$STables = {ctor: 'STables'};
 var _user$project$Models$SQuery = {ctor: 'SQuery'};
 
+var _user$project$Msgs$UpdateQueryOffset = function (a) {
+	return {ctor: 'UpdateQueryOffset', _0: a};
+};
 var _user$project$Msgs$OnQueryResponse = function (a) {
 	return {ctor: 'OnQueryResponse', _0: a};
 };
@@ -11479,12 +11482,20 @@ var _user$project$Update$update = F2(
 						{queryResponse: _krisajenkins$remotedata$RemoteData$Loading, loading: model.loading + 1}),
 					_1: A2(_user$project$Commands_Query$runQuery, model.queryString, model)
 				};
-			default:
+			case 'OnQueryResponse':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{queryResponse: _p1._0, loading: model.loading - 1}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{queryResponseOffset: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
@@ -11644,7 +11655,15 @@ var _user$project$View_Tabs$tabs = function (model) {
 	}
 };
 
-var _user$project$View_Query$col = function (c) {
+var _user$project$Utils_List$section = F3(
+	function (offset, chunk, items) {
+		return A2(
+			_elm_lang$core$List$take,
+			chunk,
+			A2(_elm_lang$core$List$drop, offset, items));
+	});
+
+var _user$project$View_QueryTable$col = function (c) {
 	return A2(
 		_elm_lang$html$Html$td,
 		{ctor: '[]'},
@@ -11654,13 +11673,13 @@ var _user$project$View_Query$col = function (c) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$View_Query$row = function (r) {
+var _user$project$View_QueryTable$row = function (r) {
 	return A2(
 		_elm_lang$html$Html$tr,
 		{ctor: '[]'},
-		A2(_elm_lang$core$List$map, _user$project$View_Query$col, r));
+		A2(_elm_lang$core$List$map, _user$project$View_QueryTable$col, r));
 };
-var _user$project$View_Query$schema = function (sc) {
+var _user$project$View_QueryTable$schema = function (sc) {
 	return A2(
 		_elm_lang$html$Html$td,
 		{ctor: '[]'},
@@ -11673,51 +11692,181 @@ var _user$project$View_Query$schema = function (sc) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$View_Query$renderQueryTable = function (resp) {
-	var _p0 = resp;
-	switch (_p0.ctor) {
-		case 'NotAsked':
-			return _elm_lang$html$Html$text('No query');
-		case 'Loading':
-			return _elm_lang$html$Html$text('Loading...');
-		case 'Failure':
-			return _elm_lang$html$Html$text(
-				_elm_lang$core$Basics$toString(_p0._0));
-		default:
-			var _p1 = _p0._0;
-			return A2(
-				_elm_lang$html$Html$table,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$thead,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$tr,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('labels'),
-									_1: {ctor: '[]'}
-								},
-								A2(_elm_lang$core$List$map, _user$project$View_Query$schema, _p1.schema)),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
+var _user$project$View_QueryTable$renderTable = F3(
+	function (offset, chunk, data) {
+		return A2(
+			_elm_lang$html$Html$table,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$thead,
+					{ctor: '[]'},
+					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$tbody,
-							{ctor: '[]'},
-							A2(_elm_lang$core$List$map, _user$project$View_Query$row, _p1.values)),
+							_elm_lang$html$Html$tr,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('labels'),
+								_1: {ctor: '[]'}
+							},
+							A2(_elm_lang$core$List$map, _user$project$View_QueryTable$schema, data.schema)),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$tbody,
+						{ctor: '[]'},
+						A2(
+							_elm_lang$core$List$map,
+							_user$project$View_QueryTable$row,
+							A3(_user$project$Utils_List$section, offset, chunk, data.values))),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$View_QueryTable$renderTopBar = F3(
+	function (offset, chunk, numRows) {
+		var incLink = F3(
+			function (offset, txt, disabled) {
+				return disabled ? A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('disabled-link'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(txt),
+						_1: {ctor: '[]'}
+					}) : A2(
+					_elm_lang$html$Html$a,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$href('#'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(
+								_user$project$Msgs$UpdateQueryOffset(offset)),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(txt),
+						_1: {ctor: '[]'}
+					});
+			});
+		var numPages = _elm_lang$core$Basics$ceiling(
+			_elm_lang$core$Basics$toFloat(numRows) / _elm_lang$core$Basics$toFloat(chunk));
+		var currentPage = A2(_elm_lang$core$Basics_ops['%'], (offset / chunk) | 0, numPages) + 1;
+		var numLink = function (n) {
+			return A2(
+				_elm_lang$html$Html$a,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$href('#'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_user$project$Msgs$UpdateQueryOffset((n * chunk) - chunk)),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html_Attributes$attribute,
+								'data-current',
+								_elm_lang$core$Basics$toString(
+									_elm_lang$core$Native_Utils.eq(n, currentPage))),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(
+						_elm_lang$core$Basics$toString(n)),
+					_1: {ctor: '[]'}
+				});
+		};
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('query-topbar'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A3(
+					incLink,
+					offset - chunk,
+					'prev',
+					_elm_lang$core$Native_Utils.eq(currentPage, 1)),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('numbers'),
+							_1: {ctor: '[]'}
+						},
+						A2(
+							_elm_lang$core$List$map,
+							numLink,
+							A2(_elm_lang$core$List$range, 1, numPages))),
+					_1: {
+						ctor: '::',
+						_0: A3(
+							incLink,
+							offset + chunk,
+							'next',
+							_elm_lang$core$Native_Utils.eq(currentPage, numPages)),
 						_1: {ctor: '[]'}
 					}
-				});
-	}
-};
-var _user$project$View_Query$query = F2(
-	function (queryString, queryResponse) {
+				}
+			});
+	});
+var _user$project$View_QueryTable$queryTable = F3(
+	function (offset, chunk, data) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A3(
+					_user$project$View_QueryTable$renderTopBar,
+					offset,
+					chunk,
+					_elm_lang$core$List$length(data.values)),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$View_QueryTable$renderTable, offset, chunk, data),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+
+var _user$project$View_Query$renderQueryTable = F3(
+	function (offset, chunk, resp) {
+		var _p0 = resp;
+		switch (_p0.ctor) {
+			case 'NotAsked':
+				return _elm_lang$html$Html$text('No query');
+			case 'Loading':
+				return _elm_lang$html$Html$text('Loading...');
+			case 'Failure':
+				return _elm_lang$html$Html$text(
+					_elm_lang$core$Basics$toString(_p0._0));
+			default:
+				return A3(_user$project$View_QueryTable$queryTable, offset, chunk, _p0._0);
+		}
+	});
+var _user$project$View_Query$query = F4(
+	function (queryString, queryOffset, queryChunk, queryResponse) {
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -11746,7 +11895,7 @@ var _user$project$View_Query$query = F2(
 									_0: _elm_lang$html$Html_Attributes$autofocus(true),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value(queryString),
+										_0: _elm_lang$html$Html_Attributes$defaultValue(queryString),
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Events$onInput(_user$project$Msgs$OnUpdateQueryString),
@@ -11790,25 +11939,18 @@ var _user$project$View_Query$query = F2(
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$hr,
-						{ctor: '[]'},
-						{ctor: '[]'}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('query-result-container'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _user$project$View_Query$renderQueryTable(queryResponse),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('query-result-container'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A3(_user$project$View_Query$renderQueryTable, queryOffset, queryChunk, queryResponse),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
 				}
 			});
 	});
@@ -11819,7 +11961,7 @@ var _user$project$View$page = function (model) {
 		case 'Home':
 			return _elm_lang$html$Html$text('');
 		case 'Query':
-			return A2(_user$project$View_Query$query, model.queryString, model.queryResponse);
+			return A4(_user$project$View_Query$query, model.queryString, model.queryResponseOffset, model.queryResponseChunk, model.queryResponse);
 		default:
 			return A2(
 				_elm_lang$html$Html$h1,

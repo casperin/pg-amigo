@@ -23,7 +23,11 @@ page model =
             text ""
 
         Query database ->
-            query model.queryString model.queryResponse
+            query
+                model.queryString
+                model.queryResponseOffset
+                model.queryResponseChunk
+                model.queryResponse
 
         Tables database ->
             h1 [] [ text <| "tables: " ++ database ]

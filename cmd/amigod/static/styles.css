@@ -89,3 +89,29 @@ td {
 
 .query-result-container {
 }
+
+.query-topbar {
+    background: tomato;
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.query-topbar .numbers {
+    display: flex;
+    margin: 0 10px;
+}
+
+.query-topbar a, .query-topbar .disabled-link {
+    padding: 2px 7px;
+    text-decoration: none;
+    color: white;
+}
+
+.query-topbar .disabled-link {
+    color: rgba(255, 255, 255, .5)
+}
+
+.query-topbar a[data-current="True"] {
+    font-weight: bold;
+    background-color: firebrick;
+}

@@ -64,6 +64,9 @@ update msg model =
         Msgs.OnQueryResponse resp ->
             ( { model | queryResponse = resp, loading = model.loading - 1 }, Cmd.none )
 
+        Msgs.UpdateQueryOffset offset ->
+            ( { model | queryResponseOffset = offset }, Cmd.none )
+
 
 keyEventToCmd : KeyboardEvent -> Model -> Cmd Msg
 keyEventToCmd event model =
