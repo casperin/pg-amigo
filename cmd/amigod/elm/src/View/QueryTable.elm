@@ -73,5 +73,13 @@ row r =
 
 
 col : String -> Html Msg
-col c =
-    td [] [ text c ]
+col str =
+    td [] [ text <| truncate str ]
+
+
+truncate : String -> String
+truncate str =
+    if (String.length str) > 105 then
+        (String.left 100 str) ++ "…"
+    else
+        str

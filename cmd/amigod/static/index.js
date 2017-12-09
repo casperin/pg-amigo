@@ -11701,13 +11701,22 @@ var _user$project$Utils_List$section = F3(
 			A2(_elm_lang$core$List$drop, offset, items));
 	});
 
-var _user$project$View_QueryTable$col = function (c) {
+var _user$project$View_QueryTable$truncate = function (str) {
+	return (_elm_lang$core$Native_Utils.cmp(
+		_elm_lang$core$String$length(str),
+		105) > 0) ? A2(
+		_elm_lang$core$Basics_ops['++'],
+		A2(_elm_lang$core$String$left, 100, str),
+		'…') : str;
+};
+var _user$project$View_QueryTable$col = function (str) {
 	return A2(
 		_elm_lang$html$Html$td,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(c),
+			_0: _elm_lang$html$Html$text(
+				_user$project$View_QueryTable$truncate(str)),
 			_1: {ctor: '[]'}
 		});
 };
