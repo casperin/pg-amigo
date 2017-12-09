@@ -8,5 +8,20 @@
     </head>
     <body>
     </body>
-    <script>Elm.Main.fullscreen()</script>
+    <script>
+        var app = Elm.Main.fullscreen()
+
+        // Save database in localStorage
+        app.ports.saveDatabase.subscribe(function (database) {
+            window.localStorage.setItem('database', database)
+        })
+
+        // Load database from localStorage
+        app.ports.loadDatabase.subscribe(function (databases) {
+            var database = window.localStorage.getItem('database')
+            if (databases.indexOf(database) > -1) {
+                app.ports.updateDatabase.send(database)
+            }
+        })
+    </script>
 </html>

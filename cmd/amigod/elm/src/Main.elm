@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Html exposing (Html)
 import Update exposing (update)
@@ -24,7 +24,10 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    onWindow "keydown" (Json.map Msgs.HandleKeyboardEvent decodeKeyboardEvent)
+    Sub.batch
+        [ onWindow "keydown" (Json.map Msgs.HandleKeyboardEvent decodeKeyboardEvent)
+        , Msgs.updateDatabase Msgs.OnUpdateDatabase
+        ]
 
 
 init : Location -> ( Model, Cmd Msg )

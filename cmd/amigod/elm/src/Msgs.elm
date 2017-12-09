@@ -1,4 +1,4 @@
-module Msgs exposing (..)
+port module Msgs exposing (..)
 
 import Navigation
 import Keyboard.Event exposing (KeyboardEvent)
@@ -20,3 +20,12 @@ type Msg
     | RunQuery
     | OnQueryResponse (WebData QueryResponse)
     | UpdateQueryOffset Int
+
+
+port saveDatabase : String -> Cmd msg
+
+
+port loadDatabase : List String -> Cmd msg
+
+
+port updateDatabase : (String -> msg) -> Sub msg

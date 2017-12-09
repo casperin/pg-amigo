@@ -33,8 +33,11 @@ update msg model =
 
                 cmd =
                     case resp of
-                        RemoteData.Success _ ->
-                            Navigation.load <| Routing.routeToUrl SQuery m
+                        RemoteData.Success databaseServer ->
+                            Cmd.batch
+                                [ Navigation.load <| Routing.routeToUrl SQuery m
+                                , Msgs.loadDatabase databaseServer.databases
+                                ]
 
                         _ ->
                             Cmd.none
@@ -42,7 +45,12 @@ update msg model =
                 ( m, cmd )
 
         OnUpdateDatabase database ->
-            ( model, Navigation.load <| "#query/" ++ database )
+            ( model
+            , Cmd.batch
+                [ Navigation.load <| "#query/" ++ database
+                , Msgs.saveDatabase database
+                ]
+            )
 
         FocusQuery ->
             model ! [ Task.attempt OnFocusQuery (focus "query") ]

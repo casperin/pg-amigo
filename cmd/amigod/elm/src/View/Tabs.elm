@@ -26,7 +26,8 @@ tabs model =
             div [ class "tabs" ]
                 [ div [ class "database-selector" ]
                     [ select
-                        [ disabled (List.isEmpty databaseServer.databases)
+                        [ value <| Routing.getDatabase model
+                        , disabled (List.isEmpty databaseServer.databases)
                         , Events.onInput Msgs.OnUpdateDatabase
                         ]
                         (List.map

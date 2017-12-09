@@ -11131,6 +11131,20 @@ var _user$project$Models$Home = {ctor: 'Home'};
 var _user$project$Models$STables = {ctor: 'STables'};
 var _user$project$Models$SQuery = {ctor: 'SQuery'};
 
+var _user$project$Msgs$saveDatabase = _elm_lang$core$Native_Platform.outgoingPort(
+	'saveDatabase',
+	function (v) {
+		return v;
+	});
+var _user$project$Msgs$loadDatabase = _elm_lang$core$Native_Platform.outgoingPort(
+	'loadDatabase',
+	function (v) {
+		return _elm_lang$core$Native_List.toArray(v).map(
+			function (v) {
+				return v;
+			});
+	});
+var _user$project$Msgs$updateDatabase = _elm_lang$core$Native_Platform.incomingPort('updateDatabase', _elm_lang$core$Json_Decode$string);
 var _user$project$Msgs$UpdateQueryOffset = function (a) {
 	return {ctor: 'UpdateQueryOffset', _0: a};
 };
@@ -11420,19 +11434,38 @@ var _user$project$Update$update = F2(
 				var cmd = function () {
 					var _p2 = _p3;
 					if (_p2.ctor === 'Success') {
-						return _elm_lang$navigation$Navigation$load(
-							A2(_user$project$Routing$routeToUrl, _user$project$Models$SQuery, m));
+						return _elm_lang$core$Platform_Cmd$batch(
+							{
+								ctor: '::',
+								_0: _elm_lang$navigation$Navigation$load(
+									A2(_user$project$Routing$routeToUrl, _user$project$Models$SQuery, m)),
+								_1: {
+									ctor: '::',
+									_0: _user$project$Msgs$loadDatabase(_p2._0.databases),
+									_1: {ctor: '[]'}
+								}
+							});
 					} else {
 						return _elm_lang$core$Platform_Cmd$none;
 					}
 				}();
 				return {ctor: '_Tuple2', _0: m, _1: cmd};
 			case 'OnUpdateDatabase':
+				var _p4 = _p1._0;
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _elm_lang$navigation$Navigation$load(
-						A2(_elm_lang$core$Basics_ops['++'], '#query/', _p1._0))
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: _elm_lang$navigation$Navigation$load(
+								A2(_elm_lang$core$Basics_ops['++'], '#query/', _p4)),
+							_1: {
+								ctor: '::',
+								_0: _user$project$Msgs$saveDatabase(_p4),
+								_1: {ctor: '[]'}
+							}
+						})
 				};
 			case 'FocusQuery':
 				return A2(
@@ -11455,15 +11488,15 @@ var _user$project$Update$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'OnFocusQuery':
-				var _p4 = _p1._0;
-				if (_p4.ctor === 'Err') {
+				var _p5 = _p1._0;
+				if (_p5.ctor === 'Err') {
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
 								error: _elm_lang$core$Maybe$Just(
-									A2(_elm_lang$core$Basics_ops['++'], 'Could not find dom id: ', _p4._0._0))
+									A2(_elm_lang$core$Basics_ops['++'], 'Could not find dom id: ', _p5._0._0))
 							}),
 						{ctor: '[]'});
 				} else {
@@ -11573,12 +11606,17 @@ var _user$project$View_Tabs$tabs = function (model) {
 								_elm_lang$html$Html$select,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$disabled(
-										_elm_lang$core$List$isEmpty(_p1.databases)),
+									_0: _elm_lang$html$Html_Attributes$value(
+										_user$project$Routing$getDatabase(model)),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_user$project$Msgs$OnUpdateDatabase),
-										_1: {ctor: '[]'}
+										_0: _elm_lang$html$Html_Attributes$disabled(
+											_elm_lang$core$List$isEmpty(_p1.databases)),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_user$project$Msgs$OnUpdateDatabase),
+											_1: {ctor: '[]'}
+										}
 									}
 								},
 								A2(
@@ -12150,10 +12188,19 @@ var _user$project$Main$init = function (location) {
 	};
 };
 var _user$project$Main$subscriptions = function (model) {
-	return A2(
-		_user$project$Window_Events$onWindow,
-		'keydown',
-		A2(_elm_lang$core$Json_Decode$map, _user$project$Msgs$HandleKeyboardEvent, _Gizra$elm_keyboard_event$Keyboard_Event$decodeKeyboardEvent));
+	return _elm_lang$core$Platform_Sub$batch(
+		{
+			ctor: '::',
+			_0: A2(
+				_user$project$Window_Events$onWindow,
+				'keydown',
+				A2(_elm_lang$core$Json_Decode$map, _user$project$Msgs$HandleKeyboardEvent, _Gizra$elm_keyboard_event$Keyboard_Event$decodeKeyboardEvent)),
+			_1: {
+				ctor: '::',
+				_0: _user$project$Msgs$updateDatabase(_user$project$Msgs$OnUpdateDatabase),
+				_1: {ctor: '[]'}
+			}
+		});
 };
 var _user$project$Main$main = A2(
 	_elm_lang$navigation$Navigation$program,
