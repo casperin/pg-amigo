@@ -16,6 +16,7 @@ type Msg
     | OnUpdateDatabase Models.Database
     | FocusQuery
     | OnUpdateQueryString String
+    | OnForceUpdateQueryString String
     | OnFocusQuery (Result Dom.Error ())
     | RunQuery
     | OnQueryResponse (WebData QueryResponse)

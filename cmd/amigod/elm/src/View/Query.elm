@@ -2,35 +2,54 @@ module View.Query exposing (..)
 
 import RemoteData exposing (WebData)
 import Models exposing (Model, QueryResponse, SchemaColumn)
-import Msgs exposing (Msg(SetIgnoreKeyEvent, RunQuery, OnUpdateQueryString))
-import Msgs exposing (Msg)
-import Html exposing (Html, text, div, table, textarea, button, thead, tbody, tr, th, td)
-import Html.Attributes exposing (class, autofocus, defaultValue, id)
-import Html.Events exposing (onClick, onFocus, onBlur, onInput)
+import Msgs
+import Html exposing (Html, text, div, select, option, table, textarea, button, thead, tbody, tr, th, td)
+import Html.Attributes exposing (class, autofocus, defaultValue, id, value, disabled)
+import Html.Events exposing (onClick, onFocus, onBlur, onInput, on, targetValue)
+import Html.Keyed as Keyed
 import View.QueryTable exposing (queryTable)
+import Json.Decode
 
 
-query : String -> Int -> Int -> WebData QueryResponse -> Html Msg
-query queryString queryOffset queryChunk queryResponse =
+query : String -> Int -> Int -> WebData QueryResponse -> List String -> Int -> Html Msgs.Msg
+query queryString queryOffset queryChunk queryResponse queryHistory queryKey =
     div [ class "query-page" ]
         [ div [ class "query-container" ]
-            [ textarea
-                [ id "query"
-                , autofocus True
-                , defaultValue queryString
-                , onInput OnUpdateQueryString
-                , onFocus (SetIgnoreKeyEvent True)
-                , onBlur (SetIgnoreKeyEvent False)
+            [ Keyed.node "div"
+                [ class "query-textarea-container" ]
+                [ ( toString queryKey
+                  , textarea
+                        [ id "query"
+                        , autofocus True
+                        , defaultValue queryString
+                        , onInput Msgs.OnUpdateQueryString
+                        , onFocus (Msgs.SetIgnoreKeyEvent True)
+                        , onBlur (Msgs.SetIgnoreKeyEvent False)
+                        ]
+                        []
+                  )
                 ]
-                []
-            , button [ class "run-query-button", onClick RunQuery ] [ text "Run query" ]
+            , div [ class "query-controls" ]
+                [ button [ class "run-query-button", onClick Msgs.RunQuery ] [ text "Run query" ]
+                , select
+                    [ disabled <| List.isEmpty queryHistory
+                    , class "history-select"
+                    , on "change" (Json.Decode.map Msgs.OnForceUpdateQueryString targetValue)
+                    ]
+                    (option [ value "" ] [ text "History" ]
+                        :: (List.map
+                                (\q -> option [ value q ] [ text q ])
+                                queryHistory
+                           )
+                    )
+                ]
             ]
         , div [ class "query-result-container" ]
             [ renderQueryTable queryOffset queryChunk queryResponse ]
         ]
 
 
-renderQueryTable : Int -> Int -> WebData QueryResponse -> Html Msg
+renderQueryTable : Int -> Int -> WebData QueryResponse -> Html Msgs.Msg
 renderQueryTable offset chunk resp =
     case resp of
         RemoteData.NotAsked ->

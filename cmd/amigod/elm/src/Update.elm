@@ -2,12 +2,12 @@ module Update exposing (..)
 
 import RemoteData
 import Navigation
-import Commands.Query exposing (runQuery)
-import Routing exposing (updateLocation)
+import Commands.Query
+import Routing
 import Msgs exposing (Msg(..))
 import Models exposing (Model, Route(Query, Tables), SimpleRoute(SQuery))
-import Keyboard.Event exposing (KeyboardEvent)
-import Dom exposing (focus)
+import Keyboard.Event
+import Dom
 import Task
 
 
@@ -15,7 +15,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnLocationChange location ->
-            updateLocation location model
+            Routing.updateLocation location model
 
         HandleKeyboardEvent event ->
             if model.ignoreKeyEvents then
@@ -53,10 +53,13 @@ update msg model =
             )
 
         FocusQuery ->
-            model ! [ Task.attempt OnFocusQuery (focus "query") ]
+            model ! [ Task.attempt OnFocusQuery (Dom.focus "query") ]
 
         OnUpdateQueryString str ->
             ( { model | queryString = str }, Cmd.none )
+
+        OnForceUpdateQueryString str ->
+            ( { model | queryString = str, queryKey = model.queryKey + 1 }, Cmd.none )
 
         OnFocusQuery result ->
             case result of
@@ -67,16 +70,28 @@ update msg model =
                     { model | error = Nothing } ! []
 
         RunQuery ->
-            ( { model | queryResponse = RemoteData.Loading, loading = model.loading + 1 }, runQuery model.queryString model )
+            let
+                filteredHistory =
+                    List.filter ((/=) model.queryString) model.queryHistory
+
+                queryHistory =
+                    model.queryString :: filteredHistory
+            in
+                ( { model
+                    | queryResponse = RemoteData.Loading
+                    , queryHistory = List.take 100 queryHistory
+                  }
+                , Commands.Query.runQuery model.queryString model
+                )
 
         Msgs.OnQueryResponse resp ->
-            ( { model | queryResponse = resp, loading = model.loading - 1 }, Cmd.none )
+            ( { model | queryResponse = resp }, Cmd.none )
 
         Msgs.UpdateQueryOffset offset ->
             ( { model | queryResponseOffset = offset }, Cmd.none )
 
 
-keyEventToCmd : KeyboardEvent -> Model -> Cmd Msg
+keyEventToCmd : Keyboard.Event.KeyboardEvent -> Model -> Cmd Msg
 keyEventToCmd event model =
     case event.key of
         Just "q" ->

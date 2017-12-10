@@ -7328,12 +7328,6 @@ var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required = F3(
 			decoder);
 	});
 
-var _elm_lang$dom$Dom$blur = _elm_lang$dom$Native_Dom.blur;
-var _elm_lang$dom$Dom$focus = _elm_lang$dom$Native_Dom.focus;
-var _elm_lang$dom$Dom$NotFound = function (a) {
-	return {ctor: 'NotFound', _0: a};
-};
-
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
 
@@ -9837,6 +9831,16 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _elm_lang$dom$Dom$blur = _elm_lang$dom$Native_Dom.blur;
+var _elm_lang$dom$Dom$focus = _elm_lang$dom$Native_Dom.focus;
+var _elm_lang$dom$Dom$NotFound = function (a) {
+	return {ctor: 'NotFound', _0: a};
+};
+
+var _elm_lang$html$Html_Keyed$node = _elm_lang$virtual_dom$VirtualDom$keyedNode;
+var _elm_lang$html$Html_Keyed$ol = _elm_lang$html$Html_Keyed$node('ol');
+var _elm_lang$html$Html_Keyed$ul = _elm_lang$html$Html_Keyed$node('ul');
+
 var _elm_lang$http$Native_Http = function() {
 
 
@@ -11105,7 +11109,18 @@ var _krisajenkins$remotedata$RemoteData$update = F2(
 	});
 
 var _user$project$Models$initialModel = function (route) {
-	return {loading: 0, route: route, ignoreKeyEvents: false, databaseServer: _krisajenkins$remotedata$RemoteData$Loading, queryString: '', queryResponse: _krisajenkins$remotedata$RemoteData$NotAsked, queryResponseOffset: 0, queryResponseChunk: 50, error: _elm_lang$core$Maybe$Nothing};
+	return {
+		route: route,
+		ignoreKeyEvents: false,
+		databaseServer: _krisajenkins$remotedata$RemoteData$Loading,
+		queryString: '',
+		queryKey: 1,
+		queryHistory: {ctor: '[]'},
+		queryResponse: _krisajenkins$remotedata$RemoteData$NotAsked,
+		queryResponseOffset: 0,
+		queryResponseChunk: 50,
+		error: _elm_lang$core$Maybe$Nothing
+	};
 };
 var _user$project$Models$QueryResponse = F2(
 	function (a, b) {
@@ -11117,10 +11132,27 @@ var _user$project$Models$SchemaColumn = function (a) {
 var _user$project$Models$DatabaseServer = function (a) {
 	return {databases: a};
 };
-var _user$project$Models$Model = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {loading: a, route: b, ignoreKeyEvents: c, databaseServer: d, queryString: e, queryResponse: f, queryResponseOffset: g, queryResponseChunk: h, error: i};
-	});
+var _user$project$Models$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {route: a, ignoreKeyEvents: b, databaseServer: c, queryString: d, queryKey: e, queryHistory: f, queryResponse: g, queryResponseOffset: h, queryResponseChunk: i, error: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var _user$project$Models$Tables = function (a) {
 	return {ctor: 'Tables', _0: a};
 };
@@ -11154,6 +11186,9 @@ var _user$project$Msgs$OnQueryResponse = function (a) {
 var _user$project$Msgs$RunQuery = {ctor: 'RunQuery'};
 var _user$project$Msgs$OnFocusQuery = function (a) {
 	return {ctor: 'OnFocusQuery', _0: a};
+};
+var _user$project$Msgs$OnForceUpdateQueryString = function (a) {
+	return {ctor: 'OnForceUpdateQueryString', _0: a};
 };
 var _user$project$Msgs$OnUpdateQueryString = function (a) {
 	return {ctor: 'OnUpdateQueryString', _0: a};
@@ -11487,6 +11522,14 @@ var _user$project$Update$update = F2(
 						{queryString: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'OnForceUpdateQueryString':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{queryString: _p1._0, queryKey: model.queryKey + 1}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'OnFocusQuery':
 				var _p5 = _p1._0;
 				if (_p5.ctor === 'Err') {
@@ -11508,11 +11551,22 @@ var _user$project$Update$update = F2(
 						{ctor: '[]'});
 				}
 			case 'RunQuery':
+				var filteredHistory = A2(
+					_elm_lang$core$List$filter,
+					F2(
+						function (x, y) {
+							return !_elm_lang$core$Native_Utils.eq(x, y);
+						})(model.queryString),
+					model.queryHistory);
+				var queryHistory = {ctor: '::', _0: model.queryString, _1: filteredHistory};
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{queryResponse: _krisajenkins$remotedata$RemoteData$Loading, loading: model.loading + 1}),
+						{
+							queryResponse: _krisajenkins$remotedata$RemoteData$Loading,
+							queryHistory: A2(_elm_lang$core$List$take, 100, queryHistory)
+						}),
 					_1: A2(_user$project$Commands_Query$runQuery, model.queryString, model)
 				};
 			case 'OnQueryResponse':
@@ -11520,7 +11574,7 @@ var _user$project$Update$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{queryResponse: _p1._0, loading: model.loading - 1}),
+						{queryResponse: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
@@ -11912,8 +11966,8 @@ var _user$project$View_Query$renderQueryTable = F3(
 				return A3(_user$project$View_QueryTable$queryTable, offset, chunk, _p0._0);
 		}
 	});
-var _user$project$View_Query$query = F4(
-	function (queryString, queryOffset, queryChunk, queryResponse) {
+var _user$project$View_Query$query = F6(
+	function (queryString, queryOffset, queryChunk, queryResponse, queryHistory, queryKey) {
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -11932,53 +11986,134 @@ var _user$project$View_Query$query = F4(
 					},
 					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$textarea,
+						_0: A3(
+							_elm_lang$html$Html_Keyed$node,
+							'div',
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$id('query'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$autofocus(true),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$defaultValue(queryString),
-										_1: {
+								_0: _elm_lang$html$Html_Attributes$class('query-textarea-container'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Basics$toString(queryKey),
+									_1: A2(
+										_elm_lang$html$Html$textarea,
+										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onInput(_user$project$Msgs$OnUpdateQueryString),
+											_0: _elm_lang$html$Html_Attributes$id('query'),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onFocus(
-													_user$project$Msgs$SetIgnoreKeyEvent(true)),
+												_0: _elm_lang$html$Html_Attributes$autofocus(true),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onBlur(
-														_user$project$Msgs$SetIgnoreKeyEvent(false)),
-													_1: {ctor: '[]'}
+													_0: _elm_lang$html$Html_Attributes$defaultValue(queryString),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onInput(_user$project$Msgs$OnUpdateQueryString),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onFocus(
+																_user$project$Msgs$SetIgnoreKeyEvent(true)),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Events$onBlur(
+																	_user$project$Msgs$SetIgnoreKeyEvent(false)),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
 												}
 											}
-										}
-									}
-								}
-							},
-							{ctor: '[]'}),
+										},
+										{ctor: '[]'})
+								},
+								_1: {ctor: '[]'}
+							}),
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$button,
+								_elm_lang$html$Html$div,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('run-query-button'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$Msgs$RunQuery),
-										_1: {ctor: '[]'}
-									}
+									_0: _elm_lang$html$Html_Attributes$class('query-controls'),
+									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Run query'),
-									_1: {ctor: '[]'}
+									_0: A2(
+										_elm_lang$html$Html$button,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('run-query-button'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(_user$project$Msgs$RunQuery),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Run query'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$select,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$disabled(
+													_elm_lang$core$List$isEmpty(queryHistory)),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('history-select'),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html_Events$on,
+															'change',
+															A2(_elm_lang$core$Json_Decode$map, _user$project$Msgs$OnForceUpdateQueryString, _elm_lang$html$Html_Events$targetValue)),
+														_1: {ctor: '[]'}
+													}
+												}
+											},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$option,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$value(''),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('History'),
+														_1: {ctor: '[]'}
+													}),
+												_1: A2(
+													_elm_lang$core$List$map,
+													function (q) {
+														return A2(
+															_elm_lang$html$Html$option,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$value(q),
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text(q),
+																_1: {ctor: '[]'}
+															});
+													},
+													queryHistory)
+											}),
+										_1: {ctor: '[]'}
+									}
 								}),
 							_1: {ctor: '[]'}
 						}
@@ -12008,7 +12143,7 @@ var _user$project$View$page = function (model) {
 		case 'Home':
 			return _elm_lang$html$Html$text('');
 		case 'Query':
-			return A4(_user$project$View_Query$query, model.queryString, model.queryResponseOffset, model.queryResponseChunk, model.queryResponse);
+			return A6(_user$project$View_Query$query, model.queryString, model.queryResponseOffset, model.queryResponseChunk, model.queryResponse, model.queryHistory, model.queryKey);
 		default:
 			return A2(
 				_elm_lang$html$Html$h1,

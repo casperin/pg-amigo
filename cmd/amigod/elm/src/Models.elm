@@ -33,11 +33,12 @@ type alias DatabaseServer =
 
 
 type alias Model =
-    { loading : Int
-    , route : Route
+    { route : Route
     , ignoreKeyEvents : Bool
     , databaseServer : WebData DatabaseServer
     , queryString : String
+    , queryKey : Int
+    , queryHistory : List String
     , queryResponse : WebData QueryResponse
     , queryResponseOffset : Int
     , queryResponseChunk : Int
@@ -47,11 +48,12 @@ type alias Model =
 
 initialModel : Route -> Model
 initialModel route =
-    { loading = 0
-    , route = route
+    { route = route
     , ignoreKeyEvents = False
     , databaseServer = RemoteData.Loading
     , queryString = ""
+    , queryKey = 1
+    , queryHistory = []
     , queryResponse = RemoteData.NotAsked
     , queryResponseOffset = 0
     , queryResponseChunk = 50

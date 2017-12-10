@@ -28,6 +28,8 @@ page model =
                 model.queryResponseOffset
                 model.queryResponseChunk
                 model.queryResponse
+                model.queryHistory
+                model.queryKey
 
         Tables database ->
             h1 [] [ text <| "tables: " ++ database ]

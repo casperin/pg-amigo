@@ -12,13 +12,13 @@ button {
 }
 
 table {
-    font-family: monospace;
     border-collapse: collapse;
 }
 table thead td {
+    border: none;
     position: -webkit-sticky;
     position: sticky;
-    top: 0;
+    top: -1px;
 }
 tr.labels td {
     background: #008bb9;
@@ -75,7 +75,7 @@ td {
     color: black;
 }
 
-.query-container {
+.query-textarea-container {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -88,6 +88,14 @@ td {
 }
 
 .query-container textarea:focus {
+}
+
+.query-controls button {
+    margin-right: 10px;
+}
+
+.query-controls .history-select {
+    max-width: 200px;
 }
 
 .query-result-container {
