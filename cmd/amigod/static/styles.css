@@ -29,12 +29,16 @@ td {
     border: 1px solid #aaa;
 }
 
+.loading-indicator {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
 .error {
     padding: .5em;
-    background: #700;
+    background: #a00;
     color: #fdd;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px black;
 }
 
 .app {

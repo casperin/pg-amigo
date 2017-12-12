@@ -35,7 +35,7 @@ func main() {
 	r.Route("/", func(r chi.Router) {
 		r.Use(middleware.MustBeLoggedIn)
 		r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
-			http.ServeFile(w, r, filepath.Join(staticPath, "elm.html"))
+			http.ServeFile(w, r, filepath.Join(staticPath, "hyperapp.html"))
 		})
 	})
 
