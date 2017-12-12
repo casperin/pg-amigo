@@ -20,9 +20,14 @@ export const updateQuery = query => state => ({ query })
 export const updateQueryResult = queryResult => state => ({ queryResult })
 
 export const addQueryToHistory = query => state => {
-  const queryHistory = [query, ...state.queryHistory].slice(0, 20)
+  const queryHistory = [
+    query,
+    ...state.queryHistory.filter(q => q !== query)
+  ].slice(0, 20)
   localStorage.setItem("queryHistory", JSON.stringify(queryHistory))
   return { queryHistory }
 }
 
 export const updateQueryPage = queryCurrent => state => ({ queryCurrent })
+
+export const updateChunkSize = queryChunkSize => state => ({ queryChunkSize })

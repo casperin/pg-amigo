@@ -40,12 +40,14 @@
   const updateQueryResult = exports.updateQueryResult = queryResult => state => ({ queryResult });
 
   const addQueryToHistory = exports.addQueryToHistory = query => state => {
-    const queryHistory = [query, ...state.queryHistory].slice(0, 20);
+    const queryHistory = [query, ...state.queryHistory.filter(q => q !== query)].slice(0, 20);
     localStorage.setItem("queryHistory", JSON.stringify(queryHistory));
     return { queryHistory };
   };
 
   const updateQueryPage = exports.updateQueryPage = queryCurrent => state => ({ queryCurrent });
+
+  const updateChunkSize = exports.updateChunkSize = queryChunkSize => state => ({ queryChunkSize });
 });
 
 },{}],3:[function(require,module,exports){
@@ -166,6 +168,7 @@
       selectedDatabase: localStorage.getItem("selectedDatabase") || null,
       query: "",
       queryCurrent: 1,
+      queryChunkSize: 50,
       queryHistory: queryHistory(),
       error: null
     },
@@ -285,9 +288,11 @@
         "div",
         null,
         (0, _hyperapp.h)(_paginator2.default, {
-          onChange: actions.updateQueryPage,
+          onPageChange: actions.updateQueryPage,
           current: state.queryCurrent,
-          total: Math.ceil(state.queryResult.values.length / 15)
+          total: Math.ceil(state.queryResult.values.length / state.queryChunkSize),
+          queryChunkSize: state.queryChunkSize,
+          onChunkSizeChange: actions.updateChunkSize
         }),
         (0, _hyperapp.h)(
           "table",
@@ -308,7 +313,7 @@
           (0, _hyperapp.h)(
             "tbody",
             null,
-            state.queryResult.values.slice((state.queryCurrent - 1) * 15, (state.queryCurrent - 1) * 15 + 15).map((row, i) => (0, _hyperapp.h)(
+            state.queryResult.values.slice((state.queryCurrent - 1) * state.queryChunkSize, (state.queryCurrent - 1) * state.queryChunkSize + state.queryChunkSize).map((row, i) => (0, _hyperapp.h)(
               "tr",
               { key: i },
               row.map((col, i) => (0, _hyperapp.h)(
@@ -417,7 +422,7 @@
       "button",
       {
         className: "paginator__button",
-        onclick: e => props.onChange(props.current - 1),
+        onclick: e => props.onPageChange(props.current - 1),
         disabled: props.current === 1
       },
       "Prev"
@@ -433,10 +438,34 @@
       "button",
       {
         className: "paginator__button",
-        onclick: e => props.onChange(props.current + 1),
+        onclick: e => props.onPageChange(props.current + 1),
         disabled: props.current === props.total
       },
       "Next"
+    ),
+    (0, _hyperapp.h)(
+      "select",
+      { onchange: e => props.onChunkSizeChange(Number(e.target.value)) },
+      (0, _hyperapp.h)(
+        "option",
+        { value: "10", selected: props.queryChunkSize === 10 },
+        "10"
+      ),
+      (0, _hyperapp.h)(
+        "option",
+        { value: "50", selected: props.queryChunkSize === 50 },
+        "50"
+      ),
+      (0, _hyperapp.h)(
+        "option",
+        { value: "250", selected: props.queryChunkSize === 250 },
+        "250"
+      ),
+      (0, _hyperapp.h)(
+        "option",
+        { value: "1000", selected: props.queryChunkSize === 1000 },
+        "1000"
+      )
     )
   );
 });

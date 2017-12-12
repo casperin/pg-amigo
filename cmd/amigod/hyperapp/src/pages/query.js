@@ -34,9 +34,13 @@ export default ({ state, actions }) => {
       {state.queryResult && (
         <div>
           <Paginator
-            onChange={actions.updateQueryPage}
+            onPageChange={actions.updateQueryPage}
             current={state.queryCurrent}
-            total={Math.ceil(state.queryResult.values.length / 15)}
+            total={Math.ceil(
+              state.queryResult.values.length / state.queryChunkSize
+            )}
+            queryChunkSize={state.queryChunkSize}
+            onChunkSizeChange={actions.updateChunkSize}
           />
           <table>
             <thead>
@@ -49,12 +53,13 @@ export default ({ state, actions }) => {
             <tbody>
               {state.queryResult.values
                 .slice(
-                  (state.queryCurrent - 1) * 15,
-                  (state.queryCurrent - 1) * 15 + 15
+                  (state.queryCurrent - 1) * state.queryChunkSize,
+                  (state.queryCurrent - 1) * state.queryChunkSize +
+                    state.queryChunkSize
                 )
                 .map((row, i) => (
-                <tr key={i}>{row.map((col, i) => <td key={i}>{col}</td>)}</tr>
-              ))}
+                  <tr key={i}>{row.map((col, i) => <td key={i}>{col}</td>)}</tr>
+                ))}
             </tbody>
           </table>
         </div>
