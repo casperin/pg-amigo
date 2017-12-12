@@ -24,3 +24,5 @@ export const addQueryToHistory = query => state => {
   localStorage.setItem("queryHistory", JSON.stringify(queryHistory))
   return { queryHistory }
 }
+
+export const updateQueryPage = queryCurrent => state => ({ queryCurrent })

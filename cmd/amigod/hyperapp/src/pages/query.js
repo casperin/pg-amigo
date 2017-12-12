@@ -1,5 +1,6 @@
 import { h } from "hyperapp"
 import * as api from "../api"
+import Paginator from "../views/paginator"
 
 export default ({ state, actions }) => {
   return (
@@ -19,6 +20,7 @@ export default ({ state, actions }) => {
       />
       <button
         onclick={() => runQuery(state.selectedDatabase, state.query, actions)}
+        disabled={state.query.trim().length === 0}
       >
         Run
       </button>
@@ -30,20 +32,32 @@ export default ({ state, actions }) => {
       </select>
       <hr />
       {state.queryResult && (
-        <table>
-          <thead>
-            <tr>
-              {state.queryResult.schema.map(col => (
-                <td key={col.name}>{col.name}</td>
+        <div>
+          <Paginator
+            onChange={actions.updateQueryPage}
+            current={state.queryCurrent}
+            total={Math.ceil(state.queryResult.values.length / 15)}
+          />
+          <table>
+            <thead>
+              <tr>
+                {state.queryResult.schema.map(col => (
+                  <td key={col.name}>{col.name}</td>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {state.queryResult.values
+                .slice(
+                  (state.queryCurrent - 1) * 15,
+                  (state.queryCurrent - 1) * 15 + 15
+                )
+                .map((row, i) => (
+                <tr key={i}>{row.map((col, i) => <td key={i}>{col}</td>)}</tr>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {state.queryResult.values.map((row, i) => (
-              <tr key={i}>{row.map((col, i) => <td key={i}>{col}</td>)}</tr>
-            ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   )

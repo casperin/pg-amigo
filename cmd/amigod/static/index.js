@@ -44,6 +44,8 @@
     localStorage.setItem("queryHistory", JSON.stringify(queryHistory));
     return { queryHistory };
   };
+
+  const updateQueryPage = exports.updateQueryPage = queryCurrent => state => ({ queryCurrent });
 });
 
 },{}],3:[function(require,module,exports){
@@ -163,6 +165,7 @@
       databases: [],
       selectedDatabase: localStorage.getItem("selectedDatabase") || null,
       query: "",
+      queryCurrent: 1,
       queryHistory: queryHistory(),
       error: null
     },
@@ -194,17 +197,17 @@
 },{"./actions":2,"./api":3,"./pages/query":5,"./views/error":6,"./views/loading":7,"hyperapp":1}],5:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "hyperapp", "../api"], factory);
+    define(["exports", "hyperapp", "../api", "../views/paginator"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("hyperapp"), require("../api"));
+    factory(exports, require("hyperapp"), require("../api"), require("../views/paginator"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.hyperapp, global.api);
+    factory(mod.exports, global.hyperapp, global.api, global.paginator);
     global.query = mod.exports;
   }
-})(this, function (exports, _hyperapp, _api) {
+})(this, function (exports, _hyperapp, _api, _paginator) {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
@@ -212,6 +215,14 @@
   });
 
   var api = _interopRequireWildcard(_api);
+
+  var _paginator2 = _interopRequireDefault(_paginator);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
 
   function _interopRequireWildcard(obj) {
     if (obj && obj.__esModule) {
@@ -250,7 +261,8 @@
       (0, _hyperapp.h)(
         "button",
         {
-          onclick: () => runQuery(state.selectedDatabase, state.query, actions)
+          onclick: () => runQuery(state.selectedDatabase, state.query, actions),
+          disabled: state.query.trim().length === 0
         },
         "Run"
       ),
@@ -270,33 +282,42 @@
       ),
       (0, _hyperapp.h)("hr", null),
       state.queryResult && (0, _hyperapp.h)(
-        "table",
+        "div",
         null,
+        (0, _hyperapp.h)(_paginator2.default, {
+          onChange: actions.updateQueryPage,
+          current: state.queryCurrent,
+          total: Math.ceil(state.queryResult.values.length / 15)
+        }),
         (0, _hyperapp.h)(
-          "thead",
+          "table",
           null,
           (0, _hyperapp.h)(
-            "tr",
+            "thead",
             null,
-            state.queryResult.schema.map(col => (0, _hyperapp.h)(
-              "td",
-              { key: col.name },
-              col.name
+            (0, _hyperapp.h)(
+              "tr",
+              null,
+              state.queryResult.schema.map(col => (0, _hyperapp.h)(
+                "td",
+                { key: col.name },
+                col.name
+              ))
+            )
+          ),
+          (0, _hyperapp.h)(
+            "tbody",
+            null,
+            state.queryResult.values.slice((state.queryCurrent - 1) * 15, (state.queryCurrent - 1) * 15 + 15).map((row, i) => (0, _hyperapp.h)(
+              "tr",
+              { key: i },
+              row.map((col, i) => (0, _hyperapp.h)(
+                "td",
+                { key: i },
+                col
+              ))
             ))
           )
-        ),
-        (0, _hyperapp.h)(
-          "tbody",
-          null,
-          state.queryResult.values.map((row, i) => (0, _hyperapp.h)(
-            "tr",
-            { key: i },
-            row.map((col, i) => (0, _hyperapp.h)(
-              "td",
-              { key: i },
-              col
-            ))
-          ))
         )
       )
     );
@@ -315,7 +336,7 @@
   };
 });
 
-},{"../api":3,"hyperapp":1}],6:[function(require,module,exports){
+},{"../api":3,"../views/paginator":8,"hyperapp":1}],6:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
@@ -366,6 +387,57 @@
     "div",
     { className: "loading-indicator" },
     "Loading"
+  );
+});
+
+},{"hyperapp":1}],8:[function(require,module,exports){
+(function (global, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(["exports", "hyperapp"], factory);
+  } else if (typeof exports !== "undefined") {
+    factory(exports, require("hyperapp"));
+  } else {
+    var mod = {
+      exports: {}
+    };
+    factory(mod.exports, global.hyperapp);
+    global.paginator = mod.exports;
+  }
+})(this, function (exports, _hyperapp) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  exports.default = props => (0, _hyperapp.h)(
+    "div",
+    { className: "paginator" },
+    (0, _hyperapp.h)(
+      "button",
+      {
+        className: "paginator__button",
+        onclick: e => props.onChange(props.current - 1),
+        disabled: props.current === 1
+      },
+      "Prev"
+    ),
+    (0, _hyperapp.h)(
+      "div",
+      { className: "paginator__numbers" },
+      props.current,
+      " / ",
+      props.total
+    ),
+    (0, _hyperapp.h)(
+      "button",
+      {
+        className: "paginator__button",
+        onclick: e => props.onChange(props.current + 1),
+        disabled: props.current === props.total
+      },
+      "Next"
+    )
   );
 });
 

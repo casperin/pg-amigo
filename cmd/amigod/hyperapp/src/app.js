@@ -23,6 +23,7 @@ app({
     databases: [],
     selectedDatabase: localStorage.getItem("selectedDatabase") || null,
     query: "",
+    queryCurrent: 1,
     queryHistory: queryHistory(),
     error: null
   },
