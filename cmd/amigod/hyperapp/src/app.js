@@ -29,6 +29,8 @@ app({
     queryCurrent: 1,
     queryChunkSize: 50,
     queryHistory: queryHistory(),
+    queryResult: null,
+    queryStatus: "NOT_ASKED",
     error: null
   },
   actions,
@@ -53,12 +55,14 @@ app({
 })
 
 const setupShortcuts = actions => {
-  window.addEventListener("keyup", function(e) {
+  window.addEventListener("keydown", function(e) {
     if (!e.altKey) return
-    switch (e.key) {
-      case "q":
+    switch (e.keyCode) {
+      case 81: // q
+        e.preventDefault()
         return actions.changePage("query")
-      case "t":
+      case 84: // t
+        e.preventDefault()
         return actions.changePage("tables")
     }
   })

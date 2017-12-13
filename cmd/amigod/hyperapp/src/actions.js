@@ -19,6 +19,8 @@ export const selectDatabase = selectedDatabase => state => {
 
 export const updateQuery = query => state => ({ query })
 
+export const updateQueryStatus = queryStatus => state => ({ queryStatus })
+
 export const updateQueryResult = queryResult => state => ({ queryResult })
 
 export const addQueryToHistory = query => state => {

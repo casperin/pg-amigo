@@ -39,6 +39,8 @@
 
   const updateQuery = exports.updateQuery = query => state => ({ query });
 
+  const updateQueryStatus = exports.updateQueryStatus = queryStatus => state => ({ queryStatus });
+
   const updateQueryResult = exports.updateQueryResult = queryResult => state => ({ queryResult });
 
   const addQueryToHistory = exports.addQueryToHistory = query => state => {
@@ -181,6 +183,8 @@
       queryCurrent: 1,
       queryChunkSize: 50,
       queryHistory: queryHistory(),
+      queryResult: null,
+      queryStatus: "NOT_ASKED",
       error: null
     },
     actions,
@@ -207,12 +211,17 @@
   });
 
   const setupShortcuts = actions => {
-    window.addEventListener("keyup", function (e) {
+    window.addEventListener("keydown", function (e) {
       if (!e.altKey) return;
-      switch (e.key) {
-        case "q":
+      console.log(e.key, e.keyCode);
+      switch (e.keyCode) {
+        case 81:
+          // q
+          e.preventDefault();
           return actions.changePage("query");
-        case "t":
+        case 84:
+          // t
+          e.preventDefault();
           return actions.changePage("tables");
       }
     });
@@ -261,17 +270,17 @@
 },{"hyperapp":1}],6:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "hyperapp", "../api", "../views/paginator"], factory);
+    define(["exports", "hyperapp", "../api", "../views/queryResult"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("hyperapp"), require("../api"), require("../views/paginator"));
+    factory(exports, require("hyperapp"), require("../api"), require("../views/queryResult"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.hyperapp, global.api, global.paginator);
+    factory(mod.exports, global.hyperapp, global.api, global.queryResult);
     global.query = mod.exports;
   }
-})(this, function (exports, _hyperapp, _api, _paginator) {
+})(this, function (exports, _hyperapp, _api, _queryResult) {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
@@ -280,7 +289,7 @@
 
   var api = _interopRequireWildcard(_api);
 
-  var _paginator2 = _interopRequireDefault(_paginator);
+  var _queryResult2 = _interopRequireDefault(_queryResult);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -351,64 +360,24 @@
           )
         )
       ),
-      state.queryResult && (0, _hyperapp.h)(
-        "div",
-        { className: "query-result-container" },
-        (0, _hyperapp.h)(_paginator2.default, {
-          onPageChange: actions.updateQueryPage,
-          current: state.queryCurrent,
-          total: Math.ceil(state.queryResult.values.length / state.queryChunkSize),
-          queryChunkSize: state.queryChunkSize,
-          onChunkSizeChange: actions.updateChunkSize
-        }),
-        (0, _hyperapp.h)(
-          "table",
-          null,
-          (0, _hyperapp.h)(
-            "thead",
-            null,
-            (0, _hyperapp.h)(
-              "tr",
-              { className: "labels" },
-              state.queryResult.schema.map(col => (0, _hyperapp.h)(
-                "td",
-                { key: col.name },
-                col.name
-              ))
-            )
-          ),
-          (0, _hyperapp.h)(
-            "tbody",
-            null,
-            state.queryResult.values.slice((state.queryCurrent - 1) * state.queryChunkSize, (state.queryCurrent - 1) * state.queryChunkSize + state.queryChunkSize).map((row, i) => (0, _hyperapp.h)(
-              "tr",
-              { key: i },
-              row.map((col, i) => (0, _hyperapp.h)(
-                "td",
-                { key: i },
-                col
-              ))
-            ))
-          )
-        )
-      )
+      (0, _hyperapp.h)(_queryResult2.default, { state: state, actions: actions })
     );
   };
 
-  const runQuery = async (db, query, actions) => {
-    actions.loading(1);
-    try {
-      const data = await api.runQuery(db, query);
+  const runQuery = (db, query, actions) => {
+    actions.updateQueryStatus("LOADING");
+    api.runQuery(db, query).then(data => {
       actions.updateQueryResult(data);
+      actions.updateQueryStatus(data.error ? "FAILURE" : "SUCCESS");
       actions.addQueryToHistory(query);
-    } catch (e) {
+    }).catch(e => {
+      actions.updateQueryStatus("FAILURE");
       actions.handleError(e);
-    }
-    actions.loading(-1);
+    });
   };
 });
 
-},{"../api":3,"../views/paginator":11,"hyperapp":1}],7:[function(require,module,exports){
+},{"../api":3,"../views/queryResult":12,"hyperapp":1}],7:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
@@ -637,4 +606,102 @@
   );
 });
 
-},{"hyperapp":1}]},{},[4]);
+},{"hyperapp":1}],12:[function(require,module,exports){
+(function (global, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(["exports", "hyperapp", "./paginator"], factory);
+  } else if (typeof exports !== "undefined") {
+    factory(exports, require("hyperapp"), require("./paginator"));
+  } else {
+    var mod = {
+      exports: {}
+    };
+    factory(mod.exports, global.hyperapp, global.paginator);
+    global.queryResult = mod.exports;
+  }
+})(this, function (exports, _hyperapp, _paginator) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _paginator2 = _interopRequireDefault(_paginator);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  exports.default = props => {
+    switch (props.state.queryStatus) {
+      case "NOT_ASKED":
+        return null;
+
+      case "LOADING":
+        return (0, _hyperapp.h)(
+          "p",
+          null,
+          "Loading..."
+        );
+
+      case "SUCCESS":
+        return (0, _hyperapp.h)(QuerySuccess, props);
+
+      case "FAILURE":
+        return (0, _hyperapp.h)(
+          "pre",
+          { className: "query-error" },
+          props.state.queryResult.error
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const QuerySuccess = ({ state, actions }) => (0, _hyperapp.h)(
+    "div",
+    { className: "query-result-container" },
+    (0, _hyperapp.h)(_paginator2.default, {
+      onPageChange: actions.updateQueryPage,
+      current: state.queryCurrent,
+      total: Math.ceil(state.queryResult.values.length / state.queryChunkSize),
+      queryChunkSize: state.queryChunkSize,
+      onChunkSizeChange: actions.updateChunkSize
+    }),
+    (0, _hyperapp.h)(
+      "table",
+      null,
+      (0, _hyperapp.h)(
+        "thead",
+        null,
+        (0, _hyperapp.h)(
+          "tr",
+          { className: "labels" },
+          state.queryResult.schema.map(col => (0, _hyperapp.h)(
+            "td",
+            { key: col.name },
+            col.name
+          ))
+        )
+      ),
+      (0, _hyperapp.h)(
+        "tbody",
+        null,
+        state.queryResult.values.slice((state.queryCurrent - 1) * state.queryChunkSize, (state.queryCurrent - 1) * state.queryChunkSize + state.queryChunkSize).map((row, i) => (0, _hyperapp.h)(
+          "tr",
+          { key: i },
+          row.map((col, i) => (0, _hyperapp.h)(
+            "td",
+            { key: i },
+            col
+          ))
+        ))
+      )
+    )
+  );
+});
+
+},{"./paginator":11,"hyperapp":1}]},{},[4]);

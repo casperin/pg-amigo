@@ -107,6 +107,11 @@ td {
     margin-top: 30px;
 }
 
+.query-error {
+    background: pink;
+    padding: 10px;
+}
+
 .paginator {
     display: flex;
     align-items: center;

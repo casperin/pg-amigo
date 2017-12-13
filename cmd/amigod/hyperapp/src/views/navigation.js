@@ -1,6 +1,6 @@
 import { h } from "hyperapp"
 
-export default ({state, actions}) => (
+export default ({ state, actions }) => (
   <div className="navigation">
     <select
       className="database-selector"
