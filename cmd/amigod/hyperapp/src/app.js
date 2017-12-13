@@ -3,6 +3,7 @@ import * as actions from "./actions"
 import * as api from "./api"
 import Loading from "./views/loading"
 import ErrorView from "./views/error"
+import Navigation from "./views/navigation"
 import Query from "./pages/query"
 import Tables from "./pages/tables"
 import NotFound from "./pages/404"
@@ -42,7 +43,10 @@ app({
       >
         <ErrorView error={state.error} />
         <Loading count={state.loading} />
-        <Page state={state} actions={actions} />
+        <Navigation state={state} actions={actions} />
+        <div className="content">
+          <Page state={state} actions={actions} />
+        </div>
       </main>
     )
   }

@@ -5,35 +5,36 @@ import Paginator from "../views/paginator"
 export default ({ state, actions }) => {
   return (
     <div>
-      {state.databases.length > 0 && (
-        <select onchange={e => actions.selectDatabase(e.target.value)}>
-          {state.databases.map(db => (
-            <option value={db} selected={db === state.selectedDatabase}>
-              {db}
-            </option>
-          ))}
-        </select>
-      )}
-      <textarea
-        oncreate={el => el.focus()}
-        value={state.query}
-        oninput={e => actions.updateQuery(e.target.value)}
-      />
-      <button
-        onclick={() => runQuery(state.selectedDatabase, state.query, actions)}
-        disabled={state.query.trim().length === 0}
-      >
-        Run
-      </button>
-      <select onchange={e => actions.updateQuery(e.target.value)}>
-        <option value="">Previous queries</option>
-        {state.queryHistory.map(query => (
-          <option value={query}>{query}</option>
-        ))}
-      </select>
-      <hr />
+      <div className="query-container">
+        <div className="query-textarea-container">
+          <textarea
+            oncreate={el => el.focus()}
+            value={state.query}
+            oninput={e => actions.updateQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="query-controls">
+          <button
+            onclick={() => runQuery(state.selectedDatabase, state.query, actions)}
+            disabled={state.query.trim().length === 0}
+          >
+            Run
+          </button>
+          <select
+            className="history-select"
+            onchange={e => actions.updateQuery(e.target.value)}
+            >
+            <option value="">Previous queries</option>
+            {state.queryHistory.map(query => (
+              <option value={query}>{query}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {state.queryResult && (
-        <div>
+        <div className="query-result-container">
           <Paginator
             onPageChange={actions.updateQueryPage}
             current={state.queryCurrent}
@@ -45,7 +46,7 @@ export default ({ state, actions }) => {
           />
           <table>
             <thead>
-              <tr>
+              <tr className="labels">
                 {state.queryResult.schema.map(col => (
                   <td key={col.name}>{col.name}</td>
                 ))}

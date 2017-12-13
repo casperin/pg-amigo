@@ -108,17 +108,17 @@
 },{}],4:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["hyperapp", "./actions", "./api", "./views/loading", "./views/error", "./pages/query", "./pages/tables", "./pages/404"], factory);
+    define(["hyperapp", "./actions", "./api", "./views/loading", "./views/error", "./views/navigation", "./pages/query", "./pages/tables", "./pages/404"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("hyperapp"), require("./actions"), require("./api"), require("./views/loading"), require("./views/error"), require("./pages/query"), require("./pages/tables"), require("./pages/404"));
+    factory(require("hyperapp"), require("./actions"), require("./api"), require("./views/loading"), require("./views/error"), require("./views/navigation"), require("./pages/query"), require("./pages/tables"), require("./pages/404"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.hyperapp, global.actions, global.api, global.loading, global.error, global.query, global.tables, global._);
+    factory(global.hyperapp, global.actions, global.api, global.loading, global.error, global.navigation, global.query, global.tables, global._);
     global.app = mod.exports;
   }
-})(this, function (_hyperapp, _actions, _api, _loading, _error, _query, _tables, _) {
+})(this, function (_hyperapp, _actions, _api, _loading, _error, _navigation, _query, _tables, _) {
   "use strict";
 
   var actions = _interopRequireWildcard(_actions);
@@ -128,6 +128,8 @@
   var _loading2 = _interopRequireDefault(_loading);
 
   var _error2 = _interopRequireDefault(_error);
+
+  var _navigation2 = _interopRequireDefault(_navigation);
 
   var _query2 = _interopRequireDefault(_query);
 
@@ -194,7 +196,12 @@
         },
         (0, _hyperapp.h)(_error2.default, { error: state.error }),
         (0, _hyperapp.h)(_loading2.default, { count: state.loading }),
-        (0, _hyperapp.h)(Page, { state: state, actions: actions })
+        (0, _hyperapp.h)(_navigation2.default, { state: state, actions: actions }),
+        (0, _hyperapp.h)(
+          "div",
+          { className: "content" },
+          (0, _hyperapp.h)(Page, { state: state, actions: actions })
+        )
       );
     }
   });
@@ -223,7 +230,7 @@
   };
 });
 
-},{"./actions":2,"./api":3,"./pages/404":5,"./pages/query":6,"./pages/tables":7,"./views/error":8,"./views/loading":9,"hyperapp":1}],5:[function(require,module,exports){
+},{"./actions":2,"./api":3,"./pages/404":5,"./pages/query":6,"./pages/tables":7,"./views/error":8,"./views/loading":9,"./views/navigation":10,"hyperapp":1}],5:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
@@ -302,46 +309,51 @@
     return (0, _hyperapp.h)(
       "div",
       null,
-      state.databases.length > 0 && (0, _hyperapp.h)(
-        "select",
-        { onchange: e => actions.selectDatabase(e.target.value) },
-        state.databases.map(db => (0, _hyperapp.h)(
-          "option",
-          { value: db, selected: db === state.selectedDatabase },
-          db
-        ))
-      ),
-      (0, _hyperapp.h)("textarea", {
-        oncreate: el => el.focus(),
-        value: state.query,
-        oninput: e => actions.updateQuery(e.target.value)
-      }),
       (0, _hyperapp.h)(
-        "button",
-        {
-          onclick: () => runQuery(state.selectedDatabase, state.query, actions),
-          disabled: state.query.trim().length === 0
-        },
-        "Run"
-      ),
-      (0, _hyperapp.h)(
-        "select",
-        { onchange: e => actions.updateQuery(e.target.value) },
+        "div",
+        { className: "query-container" },
         (0, _hyperapp.h)(
-          "option",
-          { value: "" },
-          "Previous queries"
+          "div",
+          { className: "query-textarea-container" },
+          (0, _hyperapp.h)("textarea", {
+            oncreate: el => el.focus(),
+            value: state.query,
+            oninput: e => actions.updateQuery(e.target.value)
+          })
         ),
-        state.queryHistory.map(query => (0, _hyperapp.h)(
-          "option",
-          { value: query },
-          query
-        ))
+        (0, _hyperapp.h)(
+          "div",
+          { className: "query-controls" },
+          (0, _hyperapp.h)(
+            "button",
+            {
+              onclick: () => runQuery(state.selectedDatabase, state.query, actions),
+              disabled: state.query.trim().length === 0
+            },
+            "Run"
+          ),
+          (0, _hyperapp.h)(
+            "select",
+            {
+              className: "history-select",
+              onchange: e => actions.updateQuery(e.target.value)
+            },
+            (0, _hyperapp.h)(
+              "option",
+              { value: "" },
+              "Previous queries"
+            ),
+            state.queryHistory.map(query => (0, _hyperapp.h)(
+              "option",
+              { value: query },
+              query
+            ))
+          )
+        )
       ),
-      (0, _hyperapp.h)("hr", null),
       state.queryResult && (0, _hyperapp.h)(
         "div",
-        null,
+        { className: "query-result-container" },
         (0, _hyperapp.h)(_paginator2.default, {
           onPageChange: actions.updateQueryPage,
           current: state.queryCurrent,
@@ -357,7 +369,7 @@
             null,
             (0, _hyperapp.h)(
               "tr",
-              null,
+              { className: "labels" },
               state.queryResult.schema.map(col => (0, _hyperapp.h)(
                 "td",
                 { key: col.name },
@@ -396,7 +408,7 @@
   };
 });
 
-},{"../api":3,"../views/paginator":10,"hyperapp":1}],7:[function(require,module,exports){
+},{"../api":3,"../views/paginator":11,"hyperapp":1}],7:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
@@ -489,6 +501,69 @@
       exports: {}
     };
     factory(mod.exports, global.hyperapp);
+    global.navigation = mod.exports;
+  }
+})(this, function (exports, _hyperapp) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  exports.default = ({ state, actions }) => (0, _hyperapp.h)(
+    "div",
+    { className: "navigation" },
+    (0, _hyperapp.h)(
+      "select",
+      {
+        className: "database-selector",
+        disabled: !state.databases.length,
+        onchange: e => actions.selectDatabase(e.target.value)
+      },
+      state.databases.map(db => (0, _hyperapp.h)(
+        "option",
+        { value: db, selected: db === state.selectedDatabase },
+        db
+      ))
+    ),
+    (0, _hyperapp.h)(
+      "a",
+      {
+        href: "/query",
+        className: `${state.page === "query" ? "current" : ""}`,
+        onclick: e => {
+          e.preventDefault();
+          actions.changePage("query");
+        }
+      },
+      "Query"
+    ),
+    (0, _hyperapp.h)(
+      "a",
+      {
+        href: "/tables",
+        className: `${state.page === "tables" ? "current" : ""}`,
+        onclick: e => {
+          e.preventDefault();
+          actions.changePage("tables");
+        }
+      },
+      "Tables"
+    )
+  );
+});
+
+},{"hyperapp":1}],11:[function(require,module,exports){
+(function (global, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(["exports", "hyperapp"], factory);
+  } else if (typeof exports !== "undefined") {
+    factory(exports, require("hyperapp"));
+  } else {
+    var mod = {
+      exports: {}
+    };
+    factory(mod.exports, global.hyperapp);
     global.paginator = mod.exports;
   }
 })(this, function (exports, _hyperapp) {
@@ -527,27 +602,36 @@
       "Next"
     ),
     (0, _hyperapp.h)(
-      "select",
-      { onchange: e => props.onChunkSizeChange(Number(e.target.value)) },
+      "div",
+      { className: "paginator__chunks" },
       (0, _hyperapp.h)(
-        "option",
-        { value: "10", selected: props.queryChunkSize === 10 },
-        "10"
+        "span",
+        null,
+        "Rows / page"
       ),
       (0, _hyperapp.h)(
-        "option",
-        { value: "50", selected: props.queryChunkSize === 50 },
-        "50"
-      ),
-      (0, _hyperapp.h)(
-        "option",
-        { value: "250", selected: props.queryChunkSize === 250 },
-        "250"
-      ),
-      (0, _hyperapp.h)(
-        "option",
-        { value: "1000", selected: props.queryChunkSize === 1000 },
-        "1000"
+        "select",
+        { onchange: e => props.onChunkSizeChange(Number(e.target.value)) },
+        (0, _hyperapp.h)(
+          "option",
+          { value: "10", selected: props.queryChunkSize === 10 },
+          "10"
+        ),
+        (0, _hyperapp.h)(
+          "option",
+          { value: "50", selected: props.queryChunkSize === 50 },
+          "50"
+        ),
+        (0, _hyperapp.h)(
+          "option",
+          { value: "250", selected: props.queryChunkSize === 250 },
+          "250"
+        ),
+        (0, _hyperapp.h)(
+          "option",
+          { value: "1000", selected: props.queryChunkSize === 1000 },
+          "1000"
+        )
       )
     )
   );
