@@ -4,16 +4,18 @@ import * as api from "./api"
 import Loading from "./views/loading"
 import ErrorView from "./views/error"
 import Query from "./pages/query"
+import Tables from "./pages/tables"
+import NotFound from "./pages/404"
 
 const pages = {
-  query: Query
+  query: Query,
+  tables: Tables
 }
 
 const queryHistory = () => {
-  const a = localStorage.getItem("queryHistory")
-  if (!a) return []
-  const b = JSON.parse(a)
-  return b || []
+  const qh = localStorage.getItem("queryHistory")
+  if (!qh) return []
+  return JSON.parse(qh) || []
 }
 
 app({
@@ -30,9 +32,14 @@ app({
   },
   actions,
   view: state => actions => {
-    const Page = pages[state.page]
+    const Page = pages[state.page] || NotFound
     return (
-      <main oncreate={() => fetchDatabases(actions)}>
+      <main
+        oncreate={() => {
+          setupShortcuts(actions)
+          fetchDatabases(actions)
+        }}
+      >
         <ErrorView error={state.error} />
         <Loading count={state.loading} />
         <Page state={state} actions={actions} />
@@ -40,6 +47,18 @@ app({
     )
   }
 })
+
+const setupShortcuts = actions => {
+  window.addEventListener("keyup", function(e) {
+    if (!e.altKey) return
+    switch (e.key) {
+      case "q":
+        return actions.changePage("query")
+      case "t":
+        return actions.changePage("tables")
+    }
+  })
+}
 
 const fetchDatabases = async actions => {
   actions.loading(1)

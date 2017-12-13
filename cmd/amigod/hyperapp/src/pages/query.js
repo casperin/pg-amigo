@@ -15,6 +15,7 @@ export default ({ state, actions }) => {
         </select>
       )}
       <textarea
+        oncreate={el => el.focus()}
         value={state.query}
         oninput={e => actions.updateQuery(e.target.value)}
       />

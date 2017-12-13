@@ -4,6 +4,8 @@ export const loading = n => state => ({
 
 export const handleError = error => state => ({ error: error.message })
 
+export const changePage = page => state => ({ page })
+
 export const updateDatabases = databases => state => {
   return databases.includes(state.selectedDatabase)
     ? { databases }
@@ -30,4 +32,7 @@ export const addQueryToHistory = query => state => {
 
 export const updateQueryPage = queryCurrent => state => ({ queryCurrent })
 
-export const updateChunkSize = queryChunkSize => state => ({ queryChunkSize })
+export const updateChunkSize = queryChunkSize => state => ({
+  queryChunkSize,
+  queryCurrent: 1
+})

@@ -26,6 +26,8 @@
 
   const handleError = exports.handleError = error => state => ({ error: error.message });
 
+  const changePage = exports.changePage = page => state => ({ page });
+
   const updateDatabases = exports.updateDatabases = databases => state => {
     return databases.includes(state.selectedDatabase) ? { databases } : { databases, selectedDatabase: databases[0] };
   };
@@ -47,7 +49,10 @@
 
   const updateQueryPage = exports.updateQueryPage = queryCurrent => state => ({ queryCurrent });
 
-  const updateChunkSize = exports.updateChunkSize = queryChunkSize => state => ({ queryChunkSize });
+  const updateChunkSize = exports.updateChunkSize = queryChunkSize => state => ({
+    queryChunkSize,
+    queryCurrent: 1
+  });
 });
 
 },{}],3:[function(require,module,exports){
@@ -103,17 +108,17 @@
 },{}],4:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["hyperapp", "./actions", "./api", "./views/loading", "./views/error", "./pages/query"], factory);
+    define(["hyperapp", "./actions", "./api", "./views/loading", "./views/error", "./pages/query", "./pages/tables", "./pages/404"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("hyperapp"), require("./actions"), require("./api"), require("./views/loading"), require("./views/error"), require("./pages/query"));
+    factory(require("hyperapp"), require("./actions"), require("./api"), require("./views/loading"), require("./views/error"), require("./pages/query"), require("./pages/tables"), require("./pages/404"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.hyperapp, global.actions, global.api, global.loading, global.error, global.query);
+    factory(global.hyperapp, global.actions, global.api, global.loading, global.error, global.query, global.tables, global._);
     global.app = mod.exports;
   }
-})(this, function (_hyperapp, _actions, _api, _loading, _error, _query) {
+})(this, function (_hyperapp, _actions, _api, _loading, _error, _query, _tables, _) {
   "use strict";
 
   var actions = _interopRequireWildcard(_actions);
@@ -125,6 +130,10 @@
   var _error2 = _interopRequireDefault(_error);
 
   var _query2 = _interopRequireDefault(_query);
+
+  var _tables2 = _interopRequireDefault(_tables);
+
+  var _2 = _interopRequireDefault(_);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -150,14 +159,14 @@
   }
 
   const pages = {
-    query: _query2.default
+    query: _query2.default,
+    tables: _tables2.default
   };
 
   const queryHistory = () => {
-    const a = localStorage.getItem("queryHistory");
-    if (!a) return [];
-    const b = JSON.parse(a);
-    return b || [];
+    const qh = localStorage.getItem("queryHistory");
+    if (!qh) return [];
+    return JSON.parse(qh) || [];
   };
 
   (0, _hyperapp.app)({
@@ -174,16 +183,33 @@
     },
     actions,
     view: state => actions => {
-      const Page = pages[state.page];
+      const Page = pages[state.page] || _2.default;
       return (0, _hyperapp.h)(
         "main",
-        { oncreate: () => fetchDatabases(actions) },
+        {
+          oncreate: () => {
+            setupShortcuts(actions);
+            fetchDatabases(actions);
+          }
+        },
         (0, _hyperapp.h)(_error2.default, { error: state.error }),
         (0, _hyperapp.h)(_loading2.default, { count: state.loading }),
         (0, _hyperapp.h)(Page, { state: state, actions: actions })
       );
     }
   });
+
+  const setupShortcuts = actions => {
+    window.addEventListener("keyup", function (e) {
+      if (!e.altKey) return;
+      switch (e.key) {
+        case "q":
+          return actions.changePage("query");
+        case "t":
+          return actions.changePage("tables");
+      }
+    });
+  };
 
   const fetchDatabases = async actions => {
     actions.loading(1);
@@ -197,7 +223,35 @@
   };
 });
 
-},{"./actions":2,"./api":3,"./pages/query":5,"./views/error":6,"./views/loading":7,"hyperapp":1}],5:[function(require,module,exports){
+},{"./actions":2,"./api":3,"./pages/404":5,"./pages/query":6,"./pages/tables":7,"./views/error":8,"./views/loading":9,"hyperapp":1}],5:[function(require,module,exports){
+(function (global, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(["exports", "hyperapp"], factory);
+  } else if (typeof exports !== "undefined") {
+    factory(exports, require("hyperapp"));
+  } else {
+    var mod = {
+      exports: {}
+    };
+    factory(mod.exports, global.hyperapp);
+    global._ = mod.exports;
+  }
+})(this, function (exports, _hyperapp) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  exports.default = props => (0, _hyperapp.h)(
+    "h1",
+    null,
+    "404: ",
+    props.page
+  );
+});
+
+},{"hyperapp":1}],6:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp", "../api", "../views/paginator"], factory);
@@ -258,6 +312,7 @@
         ))
       ),
       (0, _hyperapp.h)("textarea", {
+        oncreate: el => el.focus(),
         value: state.query,
         oninput: e => actions.updateQuery(e.target.value)
       }),
@@ -341,7 +396,35 @@
   };
 });
 
-},{"../api":3,"../views/paginator":8,"hyperapp":1}],6:[function(require,module,exports){
+},{"../api":3,"../views/paginator":10,"hyperapp":1}],7:[function(require,module,exports){
+(function (global, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(["exports", "hyperapp"], factory);
+  } else if (typeof exports !== "undefined") {
+    factory(exports, require("hyperapp"));
+  } else {
+    var mod = {
+      exports: {}
+    };
+    factory(mod.exports, global.hyperapp);
+    global.tables = mod.exports;
+  }
+})(this, function (exports, _hyperapp) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  exports.default = ({ state }) => (0, _hyperapp.h)(
+    "h1",
+    null,
+    "Tables: ",
+    state.selectedDatabase
+  );
+});
+
+},{"hyperapp":1}],8:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
@@ -368,7 +451,7 @@
   ) : null;
 });
 
-},{"hyperapp":1}],7:[function(require,module,exports){
+},{"hyperapp":1}],9:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
@@ -395,7 +478,7 @@
   );
 });
 
-},{"hyperapp":1}],8:[function(require,module,exports){
+},{"hyperapp":1}],10:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
