@@ -2,7 +2,6 @@ import { h } from "hyperapp"
 import * as api from "../api"
 
 export default ({ state, actions }) => {
-  console.log(state)
   const tableDescription = state.tables[state.selectedDatabase]
 
   if (tableDescription.fetchingStatus === "NOT_ASKED") {
