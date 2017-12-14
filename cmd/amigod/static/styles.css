@@ -29,12 +29,16 @@ td {
     border: 1px solid #aaa;
 }
 
+.loading-indicator {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
 .error {
     padding: .5em;
-    background: #700;
+    background: #a00;
     color: #fdd;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px black;
 }
 
 .app {
@@ -44,7 +48,7 @@ td {
     padding: 10px;
 }
 
-.tabs {
+.navigation {
     background: #336791;
     height: 40px;
     padding: 0 10px;
@@ -52,11 +56,11 @@ td {
     align-items: stretch;
 }
 
-.tabs .database-selector {
+.navigation .database-selector {
     align-self: center;
 }
 
-.tabs a {
+.navigation a {
     text-decoration: none;
     color: white;
     font-weight: bold;
@@ -66,11 +70,11 @@ td {
     align-items: center;
 }
 
-.tabs a:hover {
+.navigation a:hover {
     background: #134771;
 }
 
-.tabs .current, .tabs .current:hover {
+.navigation .current, .navigation .current:hover {
     background: white;
     color: black;
 }
@@ -85,6 +89,7 @@ td {
     align-self: stretch;
     min-height: 50px;
     margin-bottom: 5px;
+    padding: 5px;
 }
 
 .query-container textarea:focus {
@@ -95,35 +100,32 @@ td {
 }
 
 .query-controls .history-select {
-    max-width: 200px;
+    max-width: 130px;
 }
 
 .query-result-container {
     margin-top: 30px;
 }
 
-.query-topbar {
-    background: tomato;
+.query-error {
+    background: pink;
+    padding: 10px;
+}
+
+.paginator {
     display: flex;
-    margin-bottom: 10px;
+    align-items: center;
+    margin-bottom: 5px;
 }
 
-.query-topbar .numbers {
-    display: flex;
-    margin: 0 10px;
+.paginator > * {
+    margin-right: 5px;
 }
 
-.query-topbar a, .query-topbar .disabled-link {
-    padding: 2px 7px;
-    text-decoration: none;
-    color: white;
+.paginator .paginator__chunks {
+    margin-left: 10px;
 }
 
-.query-topbar .disabled-link {
-    color: rgba(255, 255, 255, .5)
-}
-
-.query-topbar a[data-current="True"] {
-    font-weight: bold;
-    background-color: firebrick;
+.paginator .paginator__chunks span {
+    margin-right: 5px;
 }
