@@ -20,6 +20,21 @@
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+
+  var _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
   const loading = exports.loading = n => state => ({
     loading: Math.max(0, state.loading + n)
   });
@@ -29,7 +44,11 @@
   const changePage = exports.changePage = page => state => ({ page });
 
   const updateDatabases = exports.updateDatabases = databases => state => {
-    return databases.includes(state.selectedDatabase) ? { databases } : { databases, selectedDatabase: databases[0] };
+    const tables = databases.reduce((acc, db) => _extends({}, acc, {
+      [db]: { fetchingStatus: "NOT_ASKED" }
+    }), {});
+
+    return databases.includes(state.selectedDatabase) ? { databases, tables } : { databases, tables, selectedDatabase: databases[0] };
   };
 
   const selectDatabase = exports.selectDatabase = selectedDatabase => state => {
@@ -54,6 +73,22 @@
   const updateChunkSize = exports.updateChunkSize = queryChunkSize => state => ({
     queryChunkSize,
     queryCurrent: 1
+  });
+
+  const updateTables = exports.updateTables = ({ db, tableDescription }) => state => ({
+    tables: _extends({}, state.tables, { [db]: tableDescription })
+  });
+
+  const toggleShowTable = exports.toggleShowTable = ({ db, tableName }) => state => ({
+    tables: _extends({}, state.tables, {
+      [db]: _extends({}, state.tables[db], {
+        tables: _extends({}, state.tables[db].tables, {
+          [tableName]: _extends({}, state.tables[db].tables[tableName], {
+            open: !state.tables[db].tables[tableName].open
+          })
+        })
+      })
+    })
   });
 });
 
@@ -105,6 +140,8 @@
   const getDatabaseServer = exports.getDatabaseServer = () => get("/api/database-server");
 
   const runQuery = exports.runQuery = (db, query) => get("/api/query/" + db + "?q=" + query);
+
+  const getTables = exports.getTables = db => get("/api/tables/" + db);
 });
 
 },{}],4:[function(require,module,exports){
@@ -185,6 +222,7 @@
       queryHistory: queryHistory(),
       queryResult: null,
       queryStatus: "NOT_ASKED",
+      tables: {},
       error: null
     },
     actions,
@@ -213,7 +251,6 @@
   const setupShortcuts = actions => {
     window.addEventListener("keydown", function (e) {
       if (!e.altKey) return;
-      console.log(e.key, e.keyCode);
       switch (e.keyCode) {
         case 81:
           // q
@@ -380,32 +417,198 @@
 },{"../api":3,"../views/queryResult":12,"hyperapp":1}],7:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "hyperapp"], factory);
+    define(["exports", "hyperapp", "../api"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("hyperapp"));
+    factory(exports, require("hyperapp"), require("../api"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.hyperapp);
+    factory(mod.exports, global.hyperapp, global.api);
     global.tables = mod.exports;
   }
-})(this, function (exports, _hyperapp) {
+})(this, function (exports, _hyperapp, _api) {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
 
-  exports.default = ({ state }) => (0, _hyperapp.h)(
-    "h1",
-    null,
-    "Tables: ",
-    state.selectedDatabase
-  );
+  var api = _interopRequireWildcard(_api);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  var _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  exports.default = ({ state, actions }) => {
+    console.log(state);
+    const tableDescription = state.tables[state.selectedDatabase];
+
+    if (tableDescription.fetchingStatus === "NOT_ASKED") {
+      fetchTables(state.selectedDatabase, actions);
+    }
+
+    return (0, _hyperapp.h)(
+      "div",
+      null,
+      (0, _hyperapp.h)(
+        "h1",
+        null,
+        "Tableoeuoteuh: ",
+        state.selectedDatabase
+      ),
+      (0, _hyperapp.h)(Tables, {
+        db: state.selectedDatabase,
+        tableDescription: tableDescription,
+        actions: actions
+      })
+    );
+  };
+
+  const Tables = ({ db, tableDescription, actions }) => {
+    switch (tableDescription.fetchingStatus) {
+      case "NOT_ASKED":
+        return null;
+
+      case "LOADING":
+        return (0, _hyperapp.h)(
+          "p",
+          null,
+          "Loading..."
+        );
+
+      case "SUCCESS":
+        return (0, _hyperapp.h)(
+          "div",
+          null,
+          Object.entries(tableDescription.tables).map(([tableName, desc]) => (0, _hyperapp.h)(
+            "div",
+            null,
+            (0, _hyperapp.h)(
+              "h4",
+              null,
+              tableName,
+              " (",
+              desc.columns.length,
+              " columns)",
+              (0, _hyperapp.h)(
+                "button",
+                { onclick: e => actions.toggleShowTable({ db, tableName }) },
+                desc.open ? "Close" : "Open"
+              )
+            ),
+            desc.open && (0, _hyperapp.h)(
+              "table",
+              null,
+              (0, _hyperapp.h)(
+                "thead",
+                null,
+                (0, _hyperapp.h)(
+                  "tr",
+                  null,
+                  (0, _hyperapp.h)(
+                    "td",
+                    null,
+                    "Name"
+                  ),
+                  (0, _hyperapp.h)(
+                    "td",
+                    null,
+                    "isNullable"
+                  ),
+                  (0, _hyperapp.h)(
+                    "td",
+                    null,
+                    "UDT Name"
+                  )
+                )
+              ),
+              (0, _hyperapp.h)(
+                "tbody",
+                null,
+                desc.columns.map(row => (0, _hyperapp.h)(
+                  "tr",
+                  null,
+                  (0, _hyperapp.h)(
+                    "td",
+                    null,
+                    row.columnName
+                  ),
+                  (0, _hyperapp.h)(
+                    "td",
+                    null,
+                    row.isNullable
+                  ),
+                  (0, _hyperapp.h)(
+                    "td",
+                    null,
+                    row.udtName
+                  )
+                ))
+              )
+            )
+          ))
+        );
+
+      case "FAILURE":
+        return (0, _hyperapp.h)(
+          "pre",
+          { className: "display-error" },
+          tableDescription.error
+        );
+    }
+  };
+
+  const fetchTables = async (db, actions) => {
+    actions.updateTables({ db, tableDescription: { fetchingStatus: "LOADING" } });
+    actions.loading(1);
+    try {
+      const data = await api.getTables(db);
+      const tables = Object.entries(data).reduce((acc, [tableName, columns]) => _extends({}, acc, {
+        [tableName]: {
+          open: false,
+          columns
+        }
+      }), {});
+      actions.updateTables({ db, tableDescription: {
+          fetchingStatus: "SUCCESS",
+          tables
+        } });
+    } catch (e) {
+      actions.handleError(e);
+    }
+    actions.loading(-1);
+  };
 });
 
-},{"hyperapp":1}],8:[function(require,module,exports){
+},{"../api":3,"hyperapp":1}],8:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
@@ -652,7 +855,7 @@
       case "FAILURE":
         return (0, _hyperapp.h)(
           "pre",
-          { className: "query-error" },
+          { className: "display-error" },
           props.state.queryResult.error
         );
 
@@ -673,7 +876,7 @@
     }),
     (0, _hyperapp.h)(
       "table",
-      null,
+      { className: "query-table" },
       (0, _hyperapp.h)(
         "thead",
         null,

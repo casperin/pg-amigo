@@ -7,14 +7,16 @@ import (
 )
 
 type TableColumn struct {
-	TableName     string         `db:"table_name"`
-	ColumnName    string         `db:"column_name"`
-	IsNullable    string         `db:"is_nullable"`
-	ColumnDefault sql.NullString `db:"column_default"`
-	UdtName       string         `db:"udt_name"`
+	TableName     string         `db:"table_name" json:"tableName"`
+	ColumnName    string         `db:"column_name" json:"columnName"`
+	IsNullable    string         `db:"is_nullable" json:"isNullable"`
+	ColumnDefault sql.NullString `db:"column_default" json:"columnDefault"`
+	UdtName       string         `db:"udt_name" json:"udtName"`
 }
 
-func GetTablesOverview(c Selecter, dbName string) (map[string][]*TableColumn, error) {
+type Tables map[string][]*TableColumn
+
+func GetTablesOverview(c Selecter, dbName string) (Tables, error) {
 	var columns []*TableColumn
 	err := c.Select(
 		&columns,
@@ -30,7 +32,7 @@ func GetTablesOverview(c Selecter, dbName string) (map[string][]*TableColumn, er
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not get table information for db: "+dbName)
 	}
-	tables := map[string][]*TableColumn{}
+	tables := Tables{}
 	for _, c := range columns {
 		if tables[c.TableName] == nil {
 			tables[c.TableName] = []*TableColumn{}

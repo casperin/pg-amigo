@@ -13,7 +13,7 @@ export default props => {
       return <QuerySuccess {...props} />
 
     case "FAILURE":
-      return <pre className="query-error">{props.state.queryResult.error}</pre>
+      return <pre className="display-error">{props.state.queryResult.error}</pre>
 
     default:
       return null
@@ -29,7 +29,7 @@ const QuerySuccess = ({ state, actions }) => (
       queryChunkSize={state.queryChunkSize}
       onChunkSizeChange={actions.updateChunkSize}
     />
-    <table>
+    <table className='query-table'>
       <thead>
         <tr className="labels">
           {state.queryResult.schema.map(col => (

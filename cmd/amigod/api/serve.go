@@ -5,6 +5,14 @@ import (
 	"net/http"
 )
 
+type errorResponse struct {
+	Data errorResponseData `json:"data"`
+}
+
+type errorResponseData struct {
+	Error string `json:"error"`
+}
+
 func serveError(w http.ResponseWriter, code int, err error) {
 	w.WriteHeader(500)
 	w.Write([]byte(err.Error()))

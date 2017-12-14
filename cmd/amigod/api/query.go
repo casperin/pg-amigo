@@ -21,18 +21,9 @@ type queryResponseColumn struct {
 	Name string `json:"name"`
 }
 
-type errorResponse struct {
-	Data errorResponseData `json:"data"`
-}
-
-type errorResponseData struct {
-	Error string `json:"error"`
-}
-
 func Query(w http.ResponseWriter, r *http.Request) {
 	dbName := chi.URLParam(r, "db")
 	q := r.FormValue("q")
-	fmt.Println(dbName, q)
 	conn := connection.New(dbName)
 	columns, result, err := connection.QueryDB(conn, q)
 

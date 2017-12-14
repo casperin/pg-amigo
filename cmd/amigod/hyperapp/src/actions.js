@@ -7,9 +7,14 @@ export const handleError = error => state => ({ error: error.message })
 export const changePage = page => state => ({ page })
 
 export const updateDatabases = databases => state => {
+  const tables = databases.reduce((acc, db) => ({
+    ...acc,
+    [db]: {fetchingStatus: "NOT_ASKED"}
+  }), {})
+
   return databases.includes(state.selectedDatabase)
-    ? { databases }
-    : { databases, selectedDatabase: databases[0] }
+    ? { databases, tables }
+    : { databases, tables, selectedDatabase: databases[0] }
 }
 
 export const selectDatabase = selectedDatabase => state => {
@@ -37,4 +42,24 @@ export const updateQueryPage = queryCurrent => state => ({ queryCurrent })
 export const updateChunkSize = queryChunkSize => state => ({
   queryChunkSize,
   queryCurrent: 1
+})
+
+export const updateTables = ({db, tableDescription}) => state => ({
+  tables: { ...state.tables, [db]: tableDescription }
+})
+
+export const toggleShowTable = ({db, tableName}) => state => ({
+  tables: {
+    ...state.tables,
+    [db]: {
+      ...state.tables[db],
+      tables: {
+        ...state.tables[db].tables,
+        [tableName]: {
+          ...state.tables[db].tables[tableName],
+          open: !state.tables[db].tables[tableName].open
+        }
+      }
+    }
+  }
 })

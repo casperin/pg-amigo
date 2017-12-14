@@ -39,6 +39,7 @@ func main() {
 		r.Use(middleware.MustBeLoggedIn)
 		r.Get("/database-server", api.DatabaseServer)
 		r.Get("/query/{db}", api.Query)
+		r.Get("/tables/{db}", api.Tables)
 	})
 
 	port := viper.GetString("port")

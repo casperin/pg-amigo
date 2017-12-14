@@ -31,6 +31,7 @@ app({
     queryHistory: queryHistory(),
     queryResult: null,
     queryStatus: "NOT_ASKED",
+    tables: {},
     error: null
   },
   actions,

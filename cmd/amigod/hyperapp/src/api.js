@@ -15,3 +15,5 @@ const get = (url, opt) =>
 export const getDatabaseServer = () => get("/api/database-server")
 
 export const runQuery = (db, query) => get("/api/query/" + db + "?q=" + query)
+
+export const getTables = db => get("/api/tables/" + db)
