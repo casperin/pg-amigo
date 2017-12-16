@@ -13,6 +13,12 @@ type errorResponseData struct {
 	Error string `json:"error"`
 }
 
+func newErrorResponse(err error) errorResponse {
+	return errorResponse{
+		errorResponseData{err.Error()},
+	}
+}
+
 func serveError(w http.ResponseWriter, code int, err error) {
 	w.WriteHeader(500)
 	w.Write([]byte(err.Error()))

@@ -28,11 +28,7 @@ func Query(w http.ResponseWriter, r *http.Request) {
 	columns, result, err := connection.QueryDB(conn, q)
 
 	if err != nil {
-		response := errorResponse{
-			errorResponseData{err.Error()},
-		}
-
-		serveAsJSON(w, response)
+		serveAsJSON(w, newErrorResponse(err))
 		return
 	}
 

@@ -17,11 +17,7 @@ func Tables(w http.ResponseWriter, r *http.Request) {
 	tables, err := connection.GetTablesOverview(conn, dbName)
 
 	if err != nil {
-		response := errorResponse{
-			errorResponseData{err.Error()},
-		}
-
-		serveAsJSON(w, response)
+		serveAsJSON(w, newErrorResponse(err))
 		return
 	}
 
