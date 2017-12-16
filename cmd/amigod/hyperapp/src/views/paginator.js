@@ -39,5 +39,24 @@ export default props => (
         </option>
       </select>
     </div>
+
+    <div className="paginator__filter">
+      <select
+        onchange={e => props.onQueryFilterColumnChange(Number(e.target.value))}
+      >
+        {props.columnNames.map((name, i) => (
+          <option value={i} selected={props.queryFilterColumn === i}>
+            {name}
+          </option>
+        ))}
+      </select>
+
+      <input
+        value={props.queryFilterString}
+        oninput={e => props.onQueryFilterStringChange(e.target.value)}
+        placeholder="Search"
+        type="search"
+      />
+    </div>
   </div>
 )

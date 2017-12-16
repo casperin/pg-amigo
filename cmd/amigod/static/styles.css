@@ -13,7 +13,9 @@ button {
 
 table {
     border-collapse: collapse;
+    min-width: 100%;
 }
+
 table.query-table thead td {
     border: none;
     position: -webkit-sticky;
@@ -127,5 +129,14 @@ td {
 }
 
 .paginator .paginator__chunks span {
+    margin-right: 5px;
+}
+
+.paginator .paginator__filter {
+    flex: 1;
+    text-align: right;
+}
+
+.paginator .paginator__filter select {
     margin-right: 5px;
 }

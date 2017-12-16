@@ -4,13 +4,20 @@ export const loading = n => state => ({
 
 export const handleError = error => state => ({ error: error.message })
 
-export const changePage = page => state => ({ page })
+export const changePage = page => state => {
+  return page === "query"
+    ? { page, queryFilterString: "", queryFilterColumn: 0 }
+    : { page }
+}
 
 export const updateDatabases = databases => state => {
-  const tables = databases.reduce((acc, db) => ({
-    ...acc,
-    [db]: {fetchingStatus: "NOT_ASKED"}
-  }), {})
+  const tables = databases.reduce(
+    (acc, db) => ({
+      ...acc,
+      [db]: { fetchingStatus: "NOT_ASKED" }
+    }),
+    {}
+  )
 
   return databases.includes(state.selectedDatabase)
     ? { databases, tables }
@@ -23,6 +30,16 @@ export const selectDatabase = selectedDatabase => state => {
 }
 
 export const updateQuery = query => state => ({ query })
+
+export const onQueryFilterStringChange = queryFilterString => state => ({
+  queryFilterString,
+  queryCurrent: 1
+})
+
+export const onQueryFilterColumnChange = queryFilterColumn => state => ({
+  queryFilterColumn,
+  queryCurrent: 1
+})
 
 export const updateQueryStatus = queryStatus => state => ({ queryStatus })
 
@@ -44,11 +61,11 @@ export const updateChunkSize = queryChunkSize => state => ({
   queryCurrent: 1
 })
 
-export const updateTables = ({db, tableDescription}) => state => ({
+export const updateTables = ({ db, tableDescription }) => state => ({
   tables: { ...state.tables, [db]: tableDescription }
 })
 
-export const toggleShowTable = ({db, tableName}) => state => ({
+export const toggleShowTable = ({ db, tableName }) => state => ({
   tables: {
     ...state.tables,
     [db]: {

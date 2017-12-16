@@ -41,7 +41,9 @@
 
   const handleError = exports.handleError = error => state => ({ error: error.message });
 
-  const changePage = exports.changePage = page => state => ({ page });
+  const changePage = exports.changePage = page => state => {
+    return page === "query" ? { page, queryFilterString: "", queryFilterColumn: 0 } : { page };
+  };
 
   const updateDatabases = exports.updateDatabases = databases => state => {
     const tables = databases.reduce((acc, db) => _extends({}, acc, {
@@ -57,6 +59,16 @@
   };
 
   const updateQuery = exports.updateQuery = query => state => ({ query });
+
+  const onQueryFilterStringChange = exports.onQueryFilterStringChange = queryFilterString => state => ({
+    queryFilterString,
+    queryCurrent: 1
+  });
+
+  const onQueryFilterColumnChange = exports.onQueryFilterColumnChange = queryFilterColumn => state => ({
+    queryFilterColumn,
+    queryCurrent: 1
+  });
 
   const updateQueryStatus = exports.updateQueryStatus = queryStatus => state => ({ queryStatus });
 
@@ -157,7 +169,7 @@
     factory(global.hyperapp, global.actions, global.api, global.loading, global.error, global.navigation, global.query, global.tables, global._);
     global.app = mod.exports;
   }
-})(this, function (_hyperapp, _actions, _api, _loading, _error, _navigation, _query, _tables, _) {
+})(this, function (_hyperapp, _actions, _api, _loading, _error, _navigation, _query, _tables, _2) {
   "use strict";
 
   var actions = _interopRequireWildcard(_actions);
@@ -174,7 +186,7 @@
 
   var _tables2 = _interopRequireDefault(_tables);
 
-  var _2 = _interopRequireDefault(_);
+  var _3 = _interopRequireDefault(_2);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -210,24 +222,28 @@
     return JSON.parse(qh) || [];
   };
 
+  const state = {
+    page: "query",
+    loading: 0,
+    databases: [],
+    selectedDatabase: localStorage.getItem("selectedDatabase") || null,
+    query: "",
+    queryFilterString: "",
+    queryFilterColumn: 0,
+    queryCurrent: 1,
+    queryChunkSize: 50,
+    queryHistory: queryHistory(),
+    queryResult: null,
+    queryStatus: "NOT_ASKED",
+    tables: {},
+    error: null
+  };
+
   (0, _hyperapp.app)({
-    state: {
-      page: "query",
-      loading: 0,
-      databases: [],
-      selectedDatabase: localStorage.getItem("selectedDatabase") || null,
-      query: "",
-      queryCurrent: 1,
-      queryChunkSize: 50,
-      queryHistory: queryHistory(),
-      queryResult: null,
-      queryStatus: "NOT_ASKED",
-      tables: {},
-      error: null
-    },
+    state,
     actions,
     view: state => actions => {
-      const Page = pages[state.page] || _2.default;
+      const Page = pages[state.page] || _3.default;
       return (0, _hyperapp.h)(
         "main",
         {
@@ -249,8 +265,9 @@
   });
 
   const setupShortcuts = actions => {
-    window.addEventListener("keydown", function (e) {
+    window.addEventListener("keydown", e => {
       if (!e.altKey) return;
+
       switch (e.keyCode) {
         case 81:
           // q
@@ -264,15 +281,9 @@
     });
   };
 
-  const fetchDatabases = async actions => {
+  const fetchDatabases = actions => {
     actions.loading(1);
-    try {
-      const data = await api.getDatabaseServer();
-      actions.updateDatabases(data.databases);
-    } catch (e) {
-      actions.handleError(e);
-    }
-    actions.loading(-1);
+    api.getDatabaseServer().then(data => actions.updateDatabases(data.databases)).catch(actions.handleError).then(_ => actions.loading(-1));
   };
 });
 
@@ -468,7 +479,6 @@
   };
 
   exports.default = ({ state, actions }) => {
-    console.log(state);
     const tableDescription = state.tables[state.selectedDatabase];
 
     if (tableDescription.fetchingStatus === "NOT_ASKED") {
@@ -520,7 +530,9 @@
               " columns)",
               (0, _hyperapp.h)(
                 "button",
-                { onclick: e => actions.toggleShowTable({ db, tableName }) },
+                {
+                  onclick: e => actions.toggleShowTable({ db, tableName })
+                },
                 desc.open ? "Close" : "Open"
               )
             ),
@@ -597,10 +609,13 @@
           columns
         }
       }), {});
-      actions.updateTables({ db, tableDescription: {
+      actions.updateTables({
+        db,
+        tableDescription: {
           fetchingStatus: "SUCCESS",
           tables
-        } });
+        }
+      });
     } catch (e) {
       actions.handleError(e);
     }
@@ -805,6 +820,27 @@
           "1000"
         )
       )
+    ),
+    (0, _hyperapp.h)(
+      "div",
+      { className: "paginator__filter" },
+      (0, _hyperapp.h)(
+        "select",
+        {
+          onchange: e => props.onQueryFilterColumnChange(Number(e.target.value))
+        },
+        props.columnNames.map((name, i) => (0, _hyperapp.h)(
+          "option",
+          { value: i, selected: props.queryFilterColumn === i },
+          name
+        ))
+      ),
+      (0, _hyperapp.h)("input", {
+        value: props.queryFilterString,
+        oninput: e => props.onQueryFilterStringChange(e.target.value),
+        placeholder: "Search",
+        type: "search"
+      })
     )
   );
 });
@@ -864,47 +900,58 @@
     }
   };
 
-  const QuerySuccess = ({ state, actions }) => (0, _hyperapp.h)(
-    "div",
-    { className: "query-result-container" },
-    (0, _hyperapp.h)(_paginator2.default, {
-      onPageChange: actions.updateQueryPage,
-      current: state.queryCurrent,
-      total: Math.ceil(state.queryResult.values.length / state.queryChunkSize),
-      queryChunkSize: state.queryChunkSize,
-      onChunkSizeChange: actions.updateChunkSize
-    }),
-    (0, _hyperapp.h)(
-      "table",
-      { className: "query-table" },
+  const QuerySuccess = ({ state, actions }) => {
+    const values = state.queryFilterString.trim() ? state.queryResult.values.filter(row => filterRow(row, state.queryFilterString, state.queryFilterColumn)) : state.queryResult.values;
+
+    return (0, _hyperapp.h)(
+      "div",
+      { className: "query-result-container" },
+      (0, _hyperapp.h)(_paginator2.default, {
+        onPageChange: actions.updateQueryPage,
+        current: state.queryCurrent,
+        total: Math.ceil(values.length / state.queryChunkSize),
+        queryChunkSize: state.queryChunkSize,
+        onChunkSizeChange: actions.updateChunkSize,
+        queryFilterString: state.queryFilterString,
+        queryFilterColumn: state.queryFilterColumn,
+        columnNames: state.queryResult.schema.map(col => col.name),
+        onQueryFilterStringChange: actions.onQueryFilterStringChange,
+        onQueryFilterColumnChange: actions.onQueryFilterColumnChange
+      }),
       (0, _hyperapp.h)(
-        "thead",
-        null,
+        "table",
+        { className: "query-table" },
         (0, _hyperapp.h)(
-          "tr",
-          { className: "labels" },
-          state.queryResult.schema.map(col => (0, _hyperapp.h)(
-            "td",
-            { key: col.name },
-            col.name
+          "thead",
+          null,
+          (0, _hyperapp.h)(
+            "tr",
+            { className: "labels" },
+            state.queryResult.schema.map(col => (0, _hyperapp.h)(
+              "td",
+              { key: col.name },
+              col.name
+            ))
+          )
+        ),
+        (0, _hyperapp.h)(
+          "tbody",
+          null,
+          values.slice((state.queryCurrent - 1) * state.queryChunkSize, (state.queryCurrent - 1) * state.queryChunkSize + state.queryChunkSize).map((row, i) => (0, _hyperapp.h)(
+            "tr",
+            { key: i },
+            row.map((col, i) => (0, _hyperapp.h)(
+              "td",
+              { key: i },
+              col.substr(0, 200)
+            ))
           ))
         )
-      ),
-      (0, _hyperapp.h)(
-        "tbody",
-        null,
-        state.queryResult.values.slice((state.queryCurrent - 1) * state.queryChunkSize, (state.queryCurrent - 1) * state.queryChunkSize + state.queryChunkSize).map((row, i) => (0, _hyperapp.h)(
-          "tr",
-          { key: i },
-          row.map((col, i) => (0, _hyperapp.h)(
-            "td",
-            { key: i },
-            col
-          ))
-        ))
       )
-    )
-  );
+    );
+  };
+
+  const filterRow = (row, strs, colIdx) => strs.toLowerCase().split(" ").every(str => row[colIdx] && row[colIdx].toLowerCase().includes(str));
 });
 
 },{"./paginator":11,"hyperapp":1}]},{},[4]);

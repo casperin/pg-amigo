@@ -20,8 +20,8 @@ export default ({ state, actions }) => {
   )
 }
 
-const Tables = ({db, tableDescription, actions}) => {
-  switch(tableDescription.fetchingStatus) {
+const Tables = ({ db, tableDescription, actions }) => {
+  switch (tableDescription.fetchingStatus) {
     case "NOT_ASKED":
       return null
 
@@ -35,7 +35,9 @@ const Tables = ({db, tableDescription, actions}) => {
             <div>
               <h4>
                 {tableName} ({desc.columns.length} columns)
-                <button onclick={e => actions.toggleShowTable({db, tableName})}>
+                <button
+                  onclick={e => actions.toggleShowTable({ db, tableName })}
+                >
                   {desc.open ? "Close" : "Open"}
                 </button>
               </h4>
@@ -70,7 +72,7 @@ const Tables = ({db, tableDescription, actions}) => {
 }
 
 const fetchTables = async (db, actions) => {
-  actions.updateTables({db, tableDescription: {fetchingStatus: "LOADING"}})
+  actions.updateTables({ db, tableDescription: { fetchingStatus: "LOADING" } })
   actions.loading(1)
   try {
     const data = await api.getTables(db)
@@ -84,10 +86,13 @@ const fetchTables = async (db, actions) => {
       }),
       {}
     )
-    actions.updateTables({db, tableDescription: {
-      fetchingStatus: "SUCCESS",
-      tables
-    }})
+    actions.updateTables({
+      db,
+      tableDescription: {
+        fetchingStatus: "SUCCESS",
+        tables
+      }
+    })
   } catch (e) {
     actions.handleError(e)
   }

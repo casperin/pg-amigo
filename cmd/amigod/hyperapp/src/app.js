@@ -19,21 +19,25 @@ const queryHistory = () => {
   return JSON.parse(qh) || []
 }
 
+const state = {
+  page: "query",
+  loading: 0,
+  databases: [],
+  selectedDatabase: localStorage.getItem("selectedDatabase") || null,
+  query: "",
+  queryFilterString: "",
+  queryFilterColumn: 0,
+  queryCurrent: 1,
+  queryChunkSize: 50,
+  queryHistory: queryHistory(),
+  queryResult: null,
+  queryStatus: "NOT_ASKED",
+  tables: {},
+  error: null
+}
+
 app({
-  state: {
-    page: "query",
-    loading: 0,
-    databases: [],
-    selectedDatabase: localStorage.getItem("selectedDatabase") || null,
-    query: "",
-    queryCurrent: 1,
-    queryChunkSize: 50,
-    queryHistory: queryHistory(),
-    queryResult: null,
-    queryStatus: "NOT_ASKED",
-    tables: {},
-    error: null
-  },
+  state,
   actions,
   view: state => actions => {
     const Page = pages[state.page] || NotFound
@@ -56,8 +60,9 @@ app({
 })
 
 const setupShortcuts = actions => {
-  window.addEventListener("keydown", function(e) {
+  window.addEventListener("keydown", e => {
     if (!e.altKey) return
+
     switch (e.keyCode) {
       case 81: // q
         e.preventDefault()
@@ -69,13 +74,11 @@ const setupShortcuts = actions => {
   })
 }
 
-const fetchDatabases = async actions => {
+const fetchDatabases = actions => {
   actions.loading(1)
-  try {
-    const data = await api.getDatabaseServer()
-    actions.updateDatabases(data.databases)
-  } catch (e) {
-    actions.handleError(e)
-  }
-  actions.loading(-1)
+  api
+    .getDatabaseServer()
+    .then(data => actions.updateDatabases(data.databases))
+    .catch(actions.handleError)
+    .then(_ => actions.loading(-1))
 }
