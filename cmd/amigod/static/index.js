@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports):"function"==typeof define&&define.amd?define(["exports"],n):n(e.hyperapp={})}(this,function(e){"use strict";function n(e,n){function t(e,n){return e&&r(e.tagName.toLowerCase(),{},n.call(e.childNodes,function(e){return 3===e.nodeType?e.nodeValue:t(e,n)}))}function o(e,n){for(var r in n)e[r]=n[r];return e}function i(e,n){return o(o({},e),n)}function u(e,n,r){var t={};return 0===e.length?n:(t[e[0]]=1<e.length?u(e.slice(1),n,r[e[0]]):n,i(r,t))}function f(e,n){for(var r=0;r<e.length;r++)n=n[e[r]];return n}function p(e){return"function"==typeof e}function l(e,n,r,t){for(var o in r)p(r[o])?function(r,o){n[r]=function(r){return e=f(t,k),p(r=o(r))&&p(r=r(e))&&(r=r(n)),r&&r!==e&&!r.then&&g(k=u(t,i(e,r),k)),r}}(o,r[o]):l(e[o]||(e[o]={}),n[o]={},r[o],t.concat(o))}function c(e){if(e&&e.props)return e.props.key}function s(e,n,r,t){if("key"===n);else if("style"===n)for(var o in i(t,r=r||{}))e.style[o]=null==r[o]?"":r[o];else{try{e[n]=null==r?"":r}catch(e){}p(r)||(null==r||!1===r?e.removeAttribute(n):e.setAttribute(n,r))}}function a(e,n){if("string"==typeof e)var r=document.createTextNode(e);else{var r=(n=n||"svg"===e.type)?document.createElementNS("http://www.w3.org/2000/svg",e.type):document.createElement(e.type);e.props.oncreate&&N.push(function(){e.props.oncreate(r)});for(var t=0;t<e.children.length;t++)r.appendChild(a(e.children[t],n));for(var t in e.props)s(r,t,e.props[t])}return r}function d(e,n,r){for(var t in i(n,r)){var o=r[t],u="value"===t||"checked"===t?e[t]:n[t];o!==u&&s(e,t,o,u)}r.onupdate&&N.push(function(){r.onupdate(e,n)})}function h(e,n,r){function t(){e.removeChild(n)}r&&r.onremove?r.onremove(n,t):t()}function v(e,n,r,t,o,i){if(r===t);else if(null==r)n=e.insertBefore(a(t,o),n);else if(null!=t.type&&t.type===r.type){d(n,r.props,t.props),o=o||"svg"===t.type;for(var u=t.children.length,f=r.children.length,p={},l=[],s={},y=0;y<f;y++){var g=l[y]=n.childNodes[y],m=r.children[y],w=c(m);null!=w&&(p[w]=[g,m])}for(var y=0,b=0;b<u;){var g=l[y],m=r.children[y],N=t.children[b],w=c(m);if(s[w])y++;else{var k=c(N),x=p[k]||[];null==k?(null==w&&(v(n,g,m,N,o),b++),y++):(w===k?(v(n,x[0],x[1],N,o),y++):x[0]?(n.insertBefore(x[0],g),v(n,x[0],x[1],N,o)):v(n,g,null,N,o),b++,s[k]=N)}}for(;y<f;){var m=r.children[y],w=c(m);null==w&&h(n,l[y],m.props),y++}for(var y in p){var x=p[y],A=x[1];s[A.props.key]||h(n,x[0],A.props)}}else n&&t!==n.nodeValue&&("string"==typeof t&&"string"==typeof r?n.nodeValue=t:(n=e.insertBefore(a(t,o),i=n),h(e,i,r.props)));return n}function y(r){for(m=!m,p(r=e.view(k))&&(r=r(x)),m||(w=v(n,w,b,b=r));r=N.pop();)r()}function g(){e.view&&!m&&setTimeout(y,m=!m)}var m,w=(n=n||document.body).children[0],b=t(w,[].map),N=[],k=e.state||{},x={};return g(l(k,x,e.actions,[])),x}function r(e,n){for(var r,t=[],o=[],i=arguments.length;i-- >2;)t.push(arguments[i]);for(;t.length;)if(Array.isArray(r=t.pop()))for(i=r.length;i--;)t.push(r[i]);else null==r||!0===r||!1===r||o.push("number"==typeof r?r+="":r);return"string"==typeof e?{type:e,props:n||{},children:o}:e(n||{},o)}e.app=n,e.h=r});
+!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports):"function"==typeof define&&define.amd||n(e.hyperapp={})}(this,function(e){"use strict";e.h=function(e,n){for(var r,o=[],t=[],i=arguments.length;i-- >2;)t.push(arguments[i]);for(;t.length;)if(Array.isArray(r=t.pop()))for(i=r.length;i--;)t.push(r[i]);else null==r||!0===r||!1===r||o.push(r);return"string"==typeof e?{name:e,props:n||{},children:o}:e(n||{},o)},e.app=function(e,n,r,o){function t(e,n){return e&&{name:e.nodeName.toLowerCase(),props:{},children:n.call(e.childNodes,function(e){return 3===e.nodeType?e.nodeValue:t(e,n)})}}function i(t){for(y=!y,t=r(e,n),o&&!y&&(N=v(o,N,w,w=t));t=g.pop();)t()}function l(){y||(y=!y,setTimeout(i))}function u(e,n){var r={};for(var o in e)r[o]=e[o];for(var o in n)r[o]=n[o];return r}function f(e,n,r,o){return e.length?(o[e[0]]=1<e.length?f(e.slice(1),n,r[e[0]],{}):n,u(r,o)):n}function c(e,n){for(var r=0;r<e.length;r++)n=n[e[r]];return n}function p(n,r,o){for(var t in o)"function"==typeof o[t]?function(t,i){o[t]=function(t){return r=c(n,e),"function"==typeof(t=i(t))&&(t=t(r,o)),t&&t!==r&&!t.then&&l(e=f(n,u(r,t),e,{})),t}}(t,o[t]):p(n.concat(t),r[t]=r[t]||{},o[t]=u(o[t]))}function s(e){return e&&e.props?e.props.key:null}function a(e,n,r,o){if("key"===n);else if("style"===n)for(var t in u(o,r))e[n][t]=null==r||null==r[t]?"":r[t];else{try{e[n]=null==r?"":r}catch(e){}"function"!=typeof r&&(null==r||!1===r?e.removeAttribute(n):e.setAttribute(n,r))}}function d(e,n){var r="string"==typeof e||"number"==typeof e?document.createTextNode(e):(n=n||"svg"===e.name)?document.createElementNS("http://www.w3.org/2000/svg",e.name):document.createElement(e.name);if(e.props){e.props.oncreate&&g.push(function(){e.props.oncreate(r)});for(var o=0;o<e.children.length;o++)r.appendChild(d(e.children[o],n));for(var t in e.props)a(r,t,e.props[t])}return r}function h(e,n,r){if(r=n.props){for(var o=0;o<n.children.length;o++)h(e.childNodes[o],n.children[o]);r.ondestroy&&r.ondestroy(e)}return e}function m(e,n,r,o){function t(){e.removeChild(h(n,r))}r.props&&(o=r.props.onremove)?o(n,t):t()}function v(e,n,r,o,t,i){if(o===r);else if(null==r)n=e.insertBefore(d(o,t),n);else if(o.name&&o.name===r.name){!function(e,n,r){for(var o in u(n,r))r[o]!==("value"===o||"checked"===o?e[o]:n[o])&&a(e,o,r[o],n[o]);r.onupdate&&g.push(function(){r.onupdate(e,n)})}(n,r.props,o.props);for(var l=[],f={},c={},p=0;p<r.children.length;p++)l[p]=n.childNodes[p],null!=(w=s(y=r.children[p]))&&(f[w]=[l[p],y]);p=0;for(var h=0;h<o.children.length;){var y=r.children[p],N=o.children[h],w=s(y),b=s(N);if(c[w])p++;else if(null==b)null==w&&(v(n,l[p],y,N,t),h++),p++;else{var k=f[b]||[];w===b?(v(n,k[0],k[1],N,t),p++):k[0]?v(n,n.insertBefore(k[0],l[p]),k[1],N,t):v(n,l[p],null,N,t),h++,c[b]=N}}for(;p<r.children.length;)null==s(y=r.children[p])&&m(n,l[p],y),p++;for(var p in f)c[f[p][1].props.key]||m(n,f[p][0],f[p][1])}else o.name===r.name?n.nodeValue=o:(n=e.insertBefore(d(o,t),i=n),m(e,i,r));return n}var y,g=[],N=o&&o.children[0],w=t(N,[].map);return l(p([],e=u(e),n=u(n))),n}});
 
 },{}],2:[function(require,module,exports){
 (function (global, factory) {
@@ -239,30 +239,26 @@
     error: null
   };
 
-  (0, _hyperapp.app)({
-    state,
-    actions,
-    view: state => actions => {
-      const Page = pages[state.page] || _3.default;
-      return (0, _hyperapp.h)(
-        "main",
-        {
-          oncreate: () => {
-            setupShortcuts(actions);
-            fetchDatabases(actions);
-          }
-        },
-        (0, _hyperapp.h)(_error2.default, { error: state.error }),
-        (0, _hyperapp.h)(_loading2.default, { count: state.loading }),
-        (0, _hyperapp.h)(_navigation2.default, { state: state, actions: actions }),
-        (0, _hyperapp.h)(
-          "div",
-          { className: "content" },
-          (0, _hyperapp.h)(Page, { state: state, actions: actions })
-        )
-      );
-    }
-  });
+  (0, _hyperapp.app)(state, actions, (state, actions) => {
+    const Page = pages[state.page] || _3.default;
+    return (0, _hyperapp.h)(
+      "main",
+      {
+        oncreate: () => {
+          setupShortcuts(actions);
+          fetchDatabases(actions);
+        }
+      },
+      (0, _hyperapp.h)(_error2.default, { error: state.error }),
+      (0, _hyperapp.h)(_loading2.default, { count: state.loading }),
+      (0, _hyperapp.h)(_navigation2.default, { state: state, actions: actions }),
+      (0, _hyperapp.h)(
+        "div",
+        { className: "content" },
+        (0, _hyperapp.h)(Page, { state: state, actions: actions })
+      )
+    );
+  }, document.body);
 
   const setupShortcuts = actions => {
     window.addEventListener("keydown", e => {

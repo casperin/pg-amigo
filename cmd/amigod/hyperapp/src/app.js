@@ -36,10 +36,10 @@ const state = {
   error: null
 }
 
-app({
+app(
   state,
   actions,
-  view: state => actions => {
+  (state, actions) => {
     const Page = pages[state.page] || NotFound
     return (
       <main
@@ -56,8 +56,9 @@ app({
         </div>
       </main>
     )
-  }
-})
+  },
+  document.body
+)
 
 const setupShortcuts = actions => {
   window.addEventListener("keydown", e => {
