@@ -78,7 +78,10 @@
 
   const updateQueryStatus = exports.updateQueryStatus = queryStatus => state => ({ queryStatus });
 
-  const updateQueryResult = exports.updateQueryResult = queryResult => state => ({ queryResult });
+  const updateQueryResult = exports.updateQueryResult = queryResult => state => ({
+    queryResult,
+    queryCurrent: 1
+  });
 
   const addQueryToHistory = exports.addQueryToHistory = query => state => {
     const queryHistory = [query, ...state.queryHistory.filter(q => q !== query)].slice(0, 20);
@@ -471,27 +474,18 @@
 
   exports.default = ({ state, actions }) => {
     const tableDescription = state.tables[state.selectedDatabase] || {
-      fetchingStatus: "NOT_ASKED" };
+      fetchingStatus: "NOT_ASKED"
+    };
 
     if (tableDescription.fetchingStatus === "NOT_ASKED") {
       fetchTables(state.selectedDatabase, actions);
     }
 
-    return (0, _hyperapp.h)(
-      "div",
-      null,
-      (0, _hyperapp.h)(
-        "h1",
-        null,
-        state.selectedDatabase,
-        " tables"
-      ),
-      (0, _hyperapp.h)(Tables, {
-        db: state.selectedDatabase,
-        tableDescription: tableDescription,
-        actions: actions
-      })
-    );
+    return (0, _hyperapp.h)(Tables, {
+      db: state.selectedDatabase,
+      tableDescription: tableDescription,
+      actions: actions
+    });
   };
 
   const Tables = ({ db, tableDescription, actions }) => {
@@ -517,9 +511,15 @@
               "h2",
               null,
               tableName,
-              " (",
-              desc.columns.length,
-              " columns)",
+              "\xA0",
+              (0, _hyperapp.h)(
+                "small",
+                { style: { fontWeight: 400 } },
+                "(",
+                desc.columns.length,
+                " columns)"
+              ),
+              "\xA0",
               (0, _hyperapp.h)(
                 "button",
                 {
@@ -1036,7 +1036,7 @@
         rows: rows,
         oncreate: function (textarea) {
           const val = textarea.value;
-          textarea.value = '';
+          textarea.value = "";
           baseScrollHeight = textarea.scrollHeight;
           textarea.value = val;
           if (oncreate) oncreate(textarea);

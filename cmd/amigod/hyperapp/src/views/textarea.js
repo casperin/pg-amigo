@@ -8,16 +8,18 @@ export default (() => {
       <textarea
         {...props}
         rows={rows}
-        oncreate={function (textarea) {
+        oncreate={function(textarea) {
           const val = textarea.value
-          textarea.value = ''
+          textarea.value = ""
           baseScrollHeight = textarea.scrollHeight
           textarea.value = val
           if (oncreate) oncreate(textarea)
         }}
         oninput={e => {
           e.target.rows = rows
-          const addedRows = Math.ceil((e.target.scrollHeight - baseScrollHeight) / 18)
+          const addedRows = Math.ceil(
+            (e.target.scrollHeight - baseScrollHeight) / 18
+          )
           e.target.rows = rows + addedRows
           if (oninput) oninput(e)
         }}

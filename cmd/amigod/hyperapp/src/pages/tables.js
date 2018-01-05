@@ -3,21 +3,19 @@ import * as api from "../api"
 
 export default ({ state, actions }) => {
   const tableDescription = state.tables[state.selectedDatabase] || {
-    fetchingStatus: "NOT_ASKED" }
+    fetchingStatus: "NOT_ASKED"
+  }
 
   if (tableDescription.fetchingStatus === "NOT_ASKED") {
     fetchTables(state.selectedDatabase, actions)
   }
 
   return (
-    <div>
-      <h1>{state.selectedDatabase} tables</h1>
-      <Tables
-        db={state.selectedDatabase}
-        tableDescription={tableDescription}
-        actions={actions}
-      />
-    </div>
+    <Tables
+      db={state.selectedDatabase}
+      tableDescription={tableDescription}
+      actions={actions}
+    />
   )
 }
 
@@ -35,7 +33,12 @@ const Tables = ({ db, tableDescription, actions }) => {
           {Object.entries(tableDescription.tables).map(([tableName, desc]) => (
             <div>
               <h2>
-                {tableName} ({desc.columns.length} columns)
+                {tableName}
+                &nbsp;
+                <small style={{ fontWeight: 400 }}>
+                  ({desc.columns.length} columns)
+                </small>
+                &nbsp;
                 <button
                   onclick={e => actions.toggleShowTable({ db, tableName })}
                 >

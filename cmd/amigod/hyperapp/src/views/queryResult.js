@@ -13,9 +13,7 @@ export default props => {
       return <QuerySuccess {...props} />
 
     case "FAILURE":
-      return (
-        <pre class="display-error">{props.state.queryResult.error}</pre>
-      )
+      return <pre class="display-error">{props.state.queryResult.error}</pre>
 
     default:
       return null

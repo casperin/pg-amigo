@@ -47,7 +47,10 @@ export const onQueryFilterColumnChange = queryFilterColumn => state => ({
 
 export const updateQueryStatus = queryStatus => state => ({ queryStatus })
 
-export const updateQueryResult = queryResult => state => ({ queryResult })
+export const updateQueryResult = queryResult => state => ({
+  queryResult,
+  queryCurrent: 1
+})
 
 export const addQueryToHistory = query => state => {
   const queryHistory = [
