@@ -40,6 +40,27 @@ export default props => (
       </select>
     </div>
 
+    <div class="paginator__truncate">
+      <span>Truncate</span>
+      <select onchange={e => props.onTruncateChange(Number(e.target.value))}>
+        <option value="20" selected={props.queryTruncate === 20}>
+          20
+        </option>
+        <option value="50" selected={props.queryTruncate === 50}>
+          50
+        </option>
+        <option value="200" selected={props.queryTruncate === 200}>
+          200
+        </option>
+        <option value="1000" selected={props.queryTruncate === 1000}>
+          1000
+        </option>
+        <option value="-1" selected={props.queryTruncate === -1}>
+          None
+        </option>
+      </select>
+    </div>
+
     <div class="paginator__filter">
       <select
         onchange={e => props.onQueryFilterColumnChange(Number(e.target.value))}

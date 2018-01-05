@@ -23,7 +23,7 @@
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.toggleShowTable = exports.updateTables = exports.updateChunkSize = exports.updateQueryPage = exports.addQueryToHistory = exports.updateQueryResult = exports.updateQueryStatus = exports.onQueryFilterColumnChange = exports.onQueryFilterStringChange = exports.updateQuery = exports.selectDatabase = exports.updateDatabases = exports.changePage = exports.handleError = exports.loading = exports.location = undefined;
+  exports.toggleShowTable = exports.updateTables = exports.updateChunkSize = exports.updateQueryPage = exports.addQueryToHistory = exports.updateQueryResult = exports.updateQueryStatus = exports.onQueryFilterColumnChange = exports.onQueryFilterStringChange = exports.onTruncateChange = exports.updateQuery = exports.selectDatabase = exports.updateDatabases = exports.changePage = exports.handleError = exports.loading = exports.location = undefined;
 
   var _extends = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
@@ -65,6 +65,8 @@
   };
 
   const updateQuery = exports.updateQuery = query => state => ({ query });
+
+  const onTruncateChange = exports.onTruncateChange = queryTruncate => state => ({ queryTruncate });
 
   const onQueryFilterStringChange = exports.onQueryFilterStringChange = queryFilterString => state => ({
     queryFilterString,
@@ -651,6 +653,7 @@
     queryFilterColumn: 0,
     queryCurrent: 1,
     queryChunkSize: 50,
+    queryTruncate: 50,
     queryHistory: queryHistory(),
     queryResult: null,
     queryStatus: "NOT_ASKED",
@@ -850,6 +853,44 @@
     ),
     (0, _hyperapp.h)(
       "div",
+      { "class": "paginator__truncate" },
+      (0, _hyperapp.h)(
+        "span",
+        null,
+        "Truncate"
+      ),
+      (0, _hyperapp.h)(
+        "select",
+        { onchange: e => props.onTruncateChange(Number(e.target.value)) },
+        (0, _hyperapp.h)(
+          "option",
+          { value: "20", selected: props.queryTruncate === 20 },
+          "20"
+        ),
+        (0, _hyperapp.h)(
+          "option",
+          { value: "50", selected: props.queryTruncate === 50 },
+          "50"
+        ),
+        (0, _hyperapp.h)(
+          "option",
+          { value: "200", selected: props.queryTruncate === 200 },
+          "200"
+        ),
+        (0, _hyperapp.h)(
+          "option",
+          { value: "1000", selected: props.queryTruncate === 1000 },
+          "1000"
+        ),
+        (0, _hyperapp.h)(
+          "option",
+          { value: "-1", selected: props.queryTruncate === -1 },
+          "None"
+        )
+      )
+    ),
+    (0, _hyperapp.h)(
+      "div",
       { "class": "paginator__filter" },
       (0, _hyperapp.h)(
         "select",
@@ -939,6 +980,8 @@
         total: Math.ceil(values.length / state.queryChunkSize),
         queryChunkSize: state.queryChunkSize,
         onChunkSizeChange: actions.updateChunkSize,
+        queryTruncate: state.queryTruncate,
+        onTruncateChange: actions.onTruncateChange,
         queryFilterString: state.queryFilterString,
         queryFilterColumn: state.queryFilterColumn,
         columnNames: state.queryResult.schema.map(col => col.name),
@@ -970,7 +1013,7 @@
             row.map((col, i) => (0, _hyperapp.h)(
               "td",
               { key: i },
-              col.substr(0, 200)
+              truncate(col, state.queryTruncate)
             ))
           ))
         )
@@ -979,6 +1022,11 @@
   };
 
   const filterRow = (row, strs, colIdx) => strs.toLowerCase().split(" ").every(str => row[colIdx] && row[colIdx].toLowerCase().includes(str));
+
+  const truncate = (str, len) => {
+    if (len === -1 || str.length < len - 3) return str;
+    return str.substr(0, len) + "…";
+  };
 });
 
 },{"./paginator":13,"hyperapp":2}],15:[function(require,module,exports){

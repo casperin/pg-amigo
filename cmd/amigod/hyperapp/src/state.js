@@ -15,6 +15,7 @@ export default {
   queryFilterColumn: 0,
   queryCurrent: 1,
   queryChunkSize: 50,
+  queryTruncate: 50,
   queryHistory: queryHistory(),
   queryResult: null,
   queryStatus: "NOT_ASKED",

@@ -35,6 +35,8 @@ export const selectDatabase = selectedDatabase => state => {
 
 export const updateQuery = query => state => ({ query })
 
+export const onTruncateChange = queryTruncate => state => ({ queryTruncate })
+
 export const onQueryFilterStringChange = queryFilterString => state => ({
   queryFilterString,
   queryCurrent: 1
