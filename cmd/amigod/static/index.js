@@ -233,7 +233,7 @@
       (0, _hyperapp.h)(_navigation2.default, { state: state, actions: actions }),
       (0, _hyperapp.h)(
         "div",
-        { className: "content" },
+        { "class": "content" },
         (0, _hyperapp.h)(
           _router.Switch,
           null,
@@ -307,17 +307,17 @@
 },{"hyperapp":2}],7:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "hyperapp", "../api", "../views/queryResult"], factory);
+    define(["exports", "hyperapp", "../api", "../views/textarea", "../views/queryResult"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("hyperapp"), require("../api"), require("../views/queryResult"));
+    factory(exports, require("hyperapp"), require("../api"), require("../views/textarea"), require("../views/queryResult"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.hyperapp, global.api, global.queryResult);
+    factory(mod.exports, global.hyperapp, global.api, global.textarea, global.queryResult);
     global.query = mod.exports;
   }
-})(this, function (exports, _hyperapp, _api, _queryResult) {
+})(this, function (exports, _hyperapp, _api, _textarea, _queryResult) {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
@@ -325,6 +325,8 @@
   });
 
   var api = _interopRequireWildcard(_api);
+
+  var _textarea2 = _interopRequireDefault(_textarea);
 
   var _queryResult2 = _interopRequireDefault(_queryResult);
 
@@ -357,11 +359,11 @@
       null,
       (0, _hyperapp.h)(
         "div",
-        { className: "query-container" },
+        { "class": "query-container" },
         (0, _hyperapp.h)(
           "div",
-          { className: "query-textarea-container" },
-          (0, _hyperapp.h)("textarea", {
+          { "class": "query-textarea-container" },
+          (0, _hyperapp.h)(_textarea2.default, {
             oncreate: el => el.focus(),
             value: state.query,
             oninput: e => actions.updateQuery(e.target.value)
@@ -369,7 +371,7 @@
         ),
         (0, _hyperapp.h)(
           "div",
-          { className: "query-controls" },
+          { "class": "query-controls" },
           (0, _hyperapp.h)(
             "button",
             {
@@ -381,7 +383,7 @@
           (0, _hyperapp.h)(
             "select",
             {
-              className: "history-select",
+              "class": "history-select",
               onchange: e => actions.updateQuery(e.target.value)
             },
             (0, _hyperapp.h)(
@@ -414,7 +416,7 @@
   };
 });
 
-},{"../api":4,"../views/queryResult":14,"hyperapp":2}],8:[function(require,module,exports){
+},{"../api":4,"../views/queryResult":14,"../views/textarea":15,"hyperapp":2}],8:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp", "../api"], factory);
@@ -468,7 +470,8 @@
   };
 
   exports.default = ({ state, actions }) => {
-    const tableDescription = state.tables[state.selectedDatabase] || DEFAULT_TABLE_DESCRIPTION;
+    const tableDescription = state.tables[state.selectedDatabase] || {
+      fetchingStatus: "NOT_ASKED" };
 
     if (tableDescription.fetchingStatus === "NOT_ASKED") {
       fetchTables(state.selectedDatabase, actions);
@@ -480,8 +483,8 @@
       (0, _hyperapp.h)(
         "h1",
         null,
-        "Tableoeuoteuh: ",
-        state.selectedDatabase
+        state.selectedDatabase,
+        " tables"
       ),
       (0, _hyperapp.h)(Tables, {
         db: state.selectedDatabase,
@@ -511,7 +514,7 @@
             "div",
             null,
             (0, _hyperapp.h)(
-              "h4",
+              "h2",
               null,
               tableName,
               " (",
@@ -533,7 +536,7 @@
                 null,
                 (0, _hyperapp.h)(
                   "tr",
-                  null,
+                  { "class": "labels" },
                   (0, _hyperapp.h)(
                     "td",
                     null,
@@ -581,15 +584,14 @@
       case "FAILURE":
         return (0, _hyperapp.h)(
           "pre",
-          { className: "display-error" },
+          { "class": "display-error" },
           tableDescription.error
         );
     }
   };
 
-  const DEFAULT_TABLE_DESCRIPTION = { fetchingStatus: "LOADING" };
   const fetchTables = async (db, actions) => {
-    actions.updateTables({ db, tableDescription: DEFAULT_TABLE_DESCRIPTION });
+    actions.updateTables({ db, tableDescription: { fetchingStatus: "LOADING" } });
     actions.loading(1);
     try {
       const data = await api.getTables(db);
@@ -679,7 +681,7 @@
 
   exports.default = props => props.error ? (0, _hyperapp.h)(
     "div",
-    { className: "error" },
+    { "class": "error" },
     props.error
   ) : null;
 });
@@ -706,7 +708,7 @@
 
   exports.default = props => props.count < 1 ? null : (0, _hyperapp.h)(
     "div",
-    { className: "loading-indicator" },
+    { "class": "loading-indicator" },
     "Loading"
   );
 });
@@ -733,11 +735,11 @@
 
   exports.default = ({ state, actions }) => (0, _hyperapp.h)(
     "div",
-    { className: "navigation" },
+    { "class": "navigation" },
     (0, _hyperapp.h)(
       "select",
       {
-        className: "database-selector",
+        "class": "database-selector",
         disabled: !state.databases.length,
         onchange: e => actions.selectDatabase(e.target.value)
       },
@@ -749,12 +751,12 @@
     ),
     (0, _hyperapp.h)(
       _router.Link,
-      { to: "/", className: getCurrent("/") },
+      { to: "/", "class": getCurrent("/") },
       "Query"
     ),
     (0, _hyperapp.h)(
       _router.Link,
-      { to: "/tables", className: getCurrent("/tables") },
+      { to: "/tables", "class": getCurrent("/tables") },
       "Tables"
     )
   );
@@ -787,11 +789,11 @@
 
   exports.default = props => (0, _hyperapp.h)(
     "div",
-    { className: "paginator" },
+    { "class": "paginator" },
     (0, _hyperapp.h)(
       "button",
       {
-        className: "paginator__button",
+        "class": "paginator__button",
         onclick: e => props.onPageChange(props.current - 1),
         disabled: props.current === 1
       },
@@ -799,7 +801,7 @@
     ),
     (0, _hyperapp.h)(
       "div",
-      { className: "paginator__numbers" },
+      { "class": "paginator__numbers" },
       props.current,
       " / ",
       props.total
@@ -807,7 +809,7 @@
     (0, _hyperapp.h)(
       "button",
       {
-        className: "paginator__button",
+        "class": "paginator__button",
         onclick: e => props.onPageChange(props.current + 1),
         disabled: props.current === props.total
       },
@@ -815,7 +817,7 @@
     ),
     (0, _hyperapp.h)(
       "div",
-      { className: "paginator__chunks" },
+      { "class": "paginator__chunks" },
       (0, _hyperapp.h)(
         "span",
         null,
@@ -848,7 +850,7 @@
     ),
     (0, _hyperapp.h)(
       "div",
-      { className: "paginator__filter" },
+      { "class": "paginator__filter" },
       (0, _hyperapp.h)(
         "select",
         {
@@ -916,7 +918,7 @@
       case "FAILURE":
         return (0, _hyperapp.h)(
           "pre",
-          { className: "display-error" },
+          { "class": "display-error" },
           props.state.queryResult.error
         );
 
@@ -930,7 +932,7 @@
 
     return (0, _hyperapp.h)(
       "div",
-      { className: "query-result-container" },
+      { "class": "query-result-container" },
       (0, _hyperapp.h)(_paginator2.default, {
         onPageChange: actions.updateQueryPage,
         current: state.queryCurrent,
@@ -945,13 +947,13 @@
       }),
       (0, _hyperapp.h)(
         "table",
-        { className: "query-table" },
+        { "class": "query-table" },
         (0, _hyperapp.h)(
           "thead",
           null,
           (0, _hyperapp.h)(
             "tr",
-            { className: "labels" },
+            { "class": "labels" },
             state.queryResult.schema.map(col => (0, _hyperapp.h)(
               "td",
               { key: col.name },
@@ -979,4 +981,75 @@
   const filterRow = (row, strs, colIdx) => strs.toLowerCase().split(" ").every(str => row[colIdx] && row[colIdx].toLowerCase().includes(str));
 });
 
-},{"./paginator":13,"hyperapp":2}]},{},[5]);
+},{"./paginator":13,"hyperapp":2}],15:[function(require,module,exports){
+(function (global, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(["exports", "hyperapp"], factory);
+  } else if (typeof exports !== "undefined") {
+    factory(exports, require("hyperapp"));
+  } else {
+    var mod = {
+      exports: {}
+    };
+    factory(mod.exports, global.hyperapp);
+    global.textarea = mod.exports;
+  }
+})(this, function (exports, _hyperapp) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  function _objectWithoutProperties(obj, keys) {
+    var target = {};
+
+    for (var i in obj) {
+      if (keys.indexOf(i) >= 0) continue;
+      if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+      target[i] = obj[i];
+    }
+
+    return target;
+  }
+
+  exports.default = (() => {
+    let baseScrollHeight;
+    return p => {
+      const { rows = 3, oncreate, oninput } = p,
+            props = _objectWithoutProperties(p, ["rows", "oncreate", "oninput"]);
+      return (0, _hyperapp.h)("textarea", _extends({}, props, {
+        rows: rows,
+        oncreate: function (textarea) {
+          const val = textarea.value;
+          textarea.value = '';
+          baseScrollHeight = textarea.scrollHeight;
+          textarea.value = val;
+          if (oncreate) oncreate(textarea);
+        },
+        oninput: e => {
+          e.target.rows = rows;
+          const addedRows = Math.ceil((e.target.scrollHeight - baseScrollHeight) / 18);
+          e.target.rows = rows + addedRows;
+          if (oninput) oninput(e);
+        }
+      }));
+    };
+  })();
+});
+
+},{"hyperapp":2}]},{},[5]);

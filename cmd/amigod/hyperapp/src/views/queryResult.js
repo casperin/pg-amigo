@@ -14,7 +14,7 @@ export default props => {
 
     case "FAILURE":
       return (
-        <pre className="display-error">{props.state.queryResult.error}</pre>
+        <pre class="display-error">{props.state.queryResult.error}</pre>
       )
 
     default:
@@ -30,7 +30,7 @@ const QuerySuccess = ({ state, actions }) => {
     : state.queryResult.values
 
   return (
-    <div className="query-result-container">
+    <div class="query-result-container">
       <Paginator
         onPageChange={actions.updateQueryPage}
         current={state.queryCurrent}
@@ -43,9 +43,9 @@ const QuerySuccess = ({ state, actions }) => {
         onQueryFilterStringChange={actions.onQueryFilterStringChange}
         onQueryFilterColumnChange={actions.onQueryFilterColumnChange}
       />
-      <table className="query-table">
+      <table class="query-table">
         <thead>
-          <tr className="labels">
+          <tr class="labels">
             {state.queryResult.schema.map(col => (
               <td key={col.name}>{col.name}</td>
             ))}

@@ -24,7 +24,7 @@ const main = app(
         <ErrorView error={state.error} />
         <Loading count={state.loading} />
         <Navigation state={state} actions={actions} />
-        <div className="content">
+        <div class="content">
           <Switch>
             <Route
               path="/tables"

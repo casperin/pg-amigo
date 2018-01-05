@@ -1,28 +1,28 @@
 import { h } from "hyperapp"
 
 export default props => (
-  <div className="paginator">
+  <div class="paginator">
     <button
-      className="paginator__button"
+      class="paginator__button"
       onclick={e => props.onPageChange(props.current - 1)}
       disabled={props.current === 1}
     >
       Prev
     </button>
 
-    <div className="paginator__numbers">
+    <div class="paginator__numbers">
       {props.current} / {props.total}
     </div>
 
     <button
-      className="paginator__button"
+      class="paginator__button"
       onclick={e => props.onPageChange(props.current + 1)}
       disabled={props.current === props.total}
     >
       Next
     </button>
 
-    <div className="paginator__chunks">
+    <div class="paginator__chunks">
       <span>Rows / page</span>
       <select onchange={e => props.onChunkSizeChange(Number(e.target.value))}>
         <option value="10" selected={props.queryChunkSize === 10}>
@@ -40,7 +40,7 @@ export default props => (
       </select>
     </div>
 
-    <div className="paginator__filter">
+    <div class="paginator__filter">
       <select
         onchange={e => props.onQueryFilterColumnChange(Number(e.target.value))}
       >

@@ -2,8 +2,8 @@ import { h } from "hyperapp"
 import * as api from "../api"
 
 export default ({ state, actions }) => {
-  const tableDescription =
-    state.tables[state.selectedDatabase] || DEFAULT_TABLE_DESCRIPTION
+  const tableDescription = state.tables[state.selectedDatabase] || {
+    fetchingStatus: "NOT_ASKED" }
 
   if (tableDescription.fetchingStatus === "NOT_ASKED") {
     fetchTables(state.selectedDatabase, actions)
@@ -11,7 +11,7 @@ export default ({ state, actions }) => {
 
   return (
     <div>
-      <h1>Tableoeuoteuh: {state.selectedDatabase}</h1>
+      <h1>{state.selectedDatabase} tables</h1>
       <Tables
         db={state.selectedDatabase}
         tableDescription={tableDescription}
@@ -34,18 +34,18 @@ const Tables = ({ db, tableDescription, actions }) => {
         <div>
           {Object.entries(tableDescription.tables).map(([tableName, desc]) => (
             <div>
-              <h4>
+              <h2>
                 {tableName} ({desc.columns.length} columns)
                 <button
                   onclick={e => actions.toggleShowTable({ db, tableName })}
                 >
                   {desc.open ? "Close" : "Open"}
                 </button>
-              </h4>
+              </h2>
               {desc.open && (
                 <table>
                   <thead>
-                    <tr>
+                    <tr class="labels">
                       <td>Name</td>
                       <td>isNullable</td>
                       <td>UDT Name</td>
@@ -68,13 +68,12 @@ const Tables = ({ db, tableDescription, actions }) => {
       )
 
     case "FAILURE":
-      return <pre className="display-error">{tableDescription.error}</pre>
+      return <pre class="display-error">{tableDescription.error}</pre>
   }
 }
 
-const DEFAULT_TABLE_DESCRIPTION = { fetchingStatus: "LOADING" }
 const fetchTables = async (db, actions) => {
-  actions.updateTables({ db, tableDescription: DEFAULT_TABLE_DESCRIPTION })
+  actions.updateTables({ db, tableDescription: { fetchingStatus: "LOADING" } })
   actions.loading(1)
   try {
     const data = await api.getTables(db)

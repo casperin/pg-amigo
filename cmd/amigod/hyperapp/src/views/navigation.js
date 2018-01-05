@@ -2,9 +2,9 @@ import { h } from "hyperapp"
 import { Link } from "@hyperapp/router"
 
 export default ({ state, actions }) => (
-  <div className="navigation">
+  <div class="navigation">
     <select
-      className="database-selector"
+      class="database-selector"
       disabled={!state.databases.length}
       onchange={e => actions.selectDatabase(e.target.value)}
     >
@@ -15,11 +15,11 @@ export default ({ state, actions }) => (
       ))}
     </select>
 
-    <Link to="/" className={getCurrent("/")}>
+    <Link to="/" class={getCurrent("/")}>
       Query
     </Link>
 
-    <Link to="/tables" className={getCurrent("/tables")}>
+    <Link to="/tables" class={getCurrent("/tables")}>
       Tables
     </Link>
   </div>
