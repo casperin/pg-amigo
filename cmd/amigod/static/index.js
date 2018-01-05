@@ -1,25 +1,29 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+!function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports,require("hyperapp")):"function"==typeof define&&define.amd||e(t.router={},t.hyperapp)}(this,function(t,e){"use strict";function n(t,e,n,o){return{isExact:t,path:e,url:n,params:o}}function o(t){for(var e=t.length;"/"===t[--e];);return t.slice(0,e+1)}var i={state:{pathname:window.location.pathname,previous:window.location.pathname},actions:{go:function(t){history.pushState(null,"",t)},set:function(t){return t}},subscribe:function(t){function e(e){t.set({pathname:window.location.pathname,previous:e.detail?window.location.previous=e.detail:window.location.previous})}var n=function(t){return t.reduce(function(t,e){var n=history[e];return history[e]=function(t,e,o){n.call(this,t,e,o),dispatchEvent(new CustomEvent("pushstate",{detail:t}))},function(){history[e]=n,t&&t()}},null)}(["pushState","replaceState"]);return addEventListener("pushstate",e),addEventListener("popstate",e),function(){removeEventListener("pushstate",e),removeEventListener("popstate",e),n()}}};t.Link=function(t,n){var o=t.to,i=t.location||window.location;return t.href=o,t.onclick=function(e){0!==e.button||e.altKey||e.metaKey||e.ctrlKey||e.shiftKey||"_blank"===t.target||e.currentTarget.origin!==i.origin||(e.preventDefault(),o!==i.pathname&&history.pushState(i.pathname,"",o))},e.h("a",t,n)},t.Route=function(t){var e=t.location||window.location,i=function(t,e,i){if(t===e||!t)return n(t===e,t,e);var a=i&&i.exact,r=o(t).split("/"),c=o(e).split("/");if(!(r.length>c.length||a&&r.length<c.length)){var u=0,s={},p=r.length;for(e="";u<p;u++){if(":"===r[u][0])try{s[r[u].slice(1)]=c[u]=decodeURI(c[u])}catch(t){continue}else if(r[u]!==c[u])return;e+=c[u]+"/"}return n(!1,t,e.slice(0,-1),s)}}(t.path,e.pathname,{exact:!t.parent});return i&&t.render({match:i,location:e})},t.Switch=function(t,e){return e[0]},t.Redirect=function(t){var e=t.location||window.location;history.replaceState(t.from||e.pathname,"",t.to)},t.location=i});
+
+},{"hyperapp":2}],2:[function(require,module,exports){
 !function(e,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports):"function"==typeof define&&define.amd||n(e.hyperapp={})}(this,function(e){"use strict";e.h=function(e,n){for(var r,o=[],t=[],i=arguments.length;i-- >2;)t.push(arguments[i]);for(;t.length;)if(Array.isArray(r=t.pop()))for(i=r.length;i--;)t.push(r[i]);else null==r||!0===r||!1===r||o.push(r);return"string"==typeof e?{name:e,props:n||{},children:o}:e(n||{},o)},e.app=function(e,n,r,o){function t(e,n){return e&&{name:e.nodeName.toLowerCase(),props:{},children:n.call(e.childNodes,function(e){return 3===e.nodeType?e.nodeValue:t(e,n)})}}function i(t){for(y=!y,t=r(e,n),o&&!y&&(N=v(o,N,w,w=t));t=g.pop();)t()}function l(){y||(y=!y,setTimeout(i))}function u(e,n){var r={};for(var o in e)r[o]=e[o];for(var o in n)r[o]=n[o];return r}function f(e,n,r,o){return e.length?(o[e[0]]=1<e.length?f(e.slice(1),n,r[e[0]],{}):n,u(r,o)):n}function c(e,n){for(var r=0;r<e.length;r++)n=n[e[r]];return n}function p(n,r,o){for(var t in o)"function"==typeof o[t]?function(t,i){o[t]=function(t){return r=c(n,e),"function"==typeof(t=i(t))&&(t=t(r,o)),t&&t!==r&&!t.then&&l(e=f(n,u(r,t),e,{})),t}}(t,o[t]):p(n.concat(t),r[t]=r[t]||{},o[t]=u(o[t]))}function s(e){return e&&e.props?e.props.key:null}function a(e,n,r,o){if("key"===n);else if("style"===n)for(var t in u(o,r))e[n][t]=null==r||null==r[t]?"":r[t];else{try{e[n]=null==r?"":r}catch(e){}"function"!=typeof r&&(null==r||!1===r?e.removeAttribute(n):e.setAttribute(n,r))}}function d(e,n){var r="string"==typeof e||"number"==typeof e?document.createTextNode(e):(n=n||"svg"===e.name)?document.createElementNS("http://www.w3.org/2000/svg",e.name):document.createElement(e.name);if(e.props){e.props.oncreate&&g.push(function(){e.props.oncreate(r)});for(var o=0;o<e.children.length;o++)r.appendChild(d(e.children[o],n));for(var t in e.props)a(r,t,e.props[t])}return r}function h(e,n,r){if(r=n.props){for(var o=0;o<n.children.length;o++)h(e.childNodes[o],n.children[o]);r.ondestroy&&r.ondestroy(e)}return e}function m(e,n,r,o){function t(){e.removeChild(h(n,r))}r.props&&(o=r.props.onremove)?o(n,t):t()}function v(e,n,r,o,t,i){if(o===r);else if(null==r)n=e.insertBefore(d(o,t),n);else if(o.name&&o.name===r.name){!function(e,n,r){for(var o in u(n,r))r[o]!==("value"===o||"checked"===o?e[o]:n[o])&&a(e,o,r[o],n[o]);r.onupdate&&g.push(function(){r.onupdate(e,n)})}(n,r.props,o.props);for(var l=[],f={},c={},p=0;p<r.children.length;p++)l[p]=n.childNodes[p],null!=(w=s(y=r.children[p]))&&(f[w]=[l[p],y]);p=0;for(var h=0;h<o.children.length;){var y=r.children[p],N=o.children[h],w=s(y),b=s(N);if(c[w])p++;else if(null==b)null==w&&(v(n,l[p],y,N,t),h++),p++;else{var k=f[b]||[];w===b?(v(n,k[0],k[1],N,t),p++):k[0]?v(n,n.insertBefore(k[0],l[p]),k[1],N,t):v(n,l[p],null,N,t),h++,c[b]=N}}for(;p<r.children.length;)null==s(y=r.children[p])&&m(n,l[p],y),p++;for(var p in f)c[f[p][1].props.key]||m(n,f[p][0],f[p][1])}else o.name===r.name?n.nodeValue=o:(n=e.insertBefore(d(o,t),i=n),m(e,i,r));return n}var y,g=[],N=o&&o.children[0],w=t(N,[].map);return l(p([],e=u(e),n=u(n))),n}});
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
+    define(["exports", "@hyperapp/router"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports);
+    factory(exports, require("@hyperapp/router"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports);
+    factory(mod.exports, global.router);
     global.actions = mod.exports;
   }
-})(this, function (exports) {
+})(this, function (exports, _router) {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  exports.toggleShowTable = exports.updateTables = exports.updateChunkSize = exports.updateQueryPage = exports.addQueryToHistory = exports.updateQueryResult = exports.updateQueryStatus = exports.onQueryFilterColumnChange = exports.onQueryFilterStringChange = exports.updateQuery = exports.selectDatabase = exports.updateDatabases = exports.changePage = exports.handleError = exports.loading = exports.location = undefined;
 
   var _extends = Object.assign || function (target) {
     for (var i = 1; i < arguments.length; i++) {
@@ -34,6 +38,8 @@
 
     return target;
   };
+
+  const location = exports.location = _router.location.actions;
 
   const loading = exports.loading = n => state => ({
     loading: Math.max(0, state.loading + n)
@@ -104,7 +110,7 @@
   });
 });
 
-},{}],3:[function(require,module,exports){
+},{"@hyperapp/router":1}],4:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports"], factory);
@@ -156,21 +162,23 @@
   const getTables = exports.getTables = db => get("/api/tables/" + db);
 });
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["hyperapp", "./actions", "./api", "./views/loading", "./views/error", "./views/navigation", "./pages/query", "./pages/tables", "./pages/404"], factory);
+    define(["hyperapp", "@hyperapp/router", "./state", "./actions", "./api", "./views/loading", "./views/error", "./views/navigation", "./pages/query", "./pages/tables", "./pages/404"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("hyperapp"), require("./actions"), require("./api"), require("./views/loading"), require("./views/error"), require("./views/navigation"), require("./pages/query"), require("./pages/tables"), require("./pages/404"));
+    factory(require("hyperapp"), require("@hyperapp/router"), require("./state"), require("./actions"), require("./api"), require("./views/loading"), require("./views/error"), require("./views/navigation"), require("./pages/query"), require("./pages/tables"), require("./pages/404"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.hyperapp, global.actions, global.api, global.loading, global.error, global.navigation, global.query, global.tables, global._);
+    factory(global.hyperapp, global.router, global.state, global.actions, global.api, global.loading, global.error, global.navigation, global.query, global.tables, global._);
     global.app = mod.exports;
   }
-})(this, function (_hyperapp, _actions, _api, _loading, _error, _navigation, _query, _tables, _2) {
+})(this, function (_hyperapp, _router, _state, _actions, _api, _loading, _error, _navigation, _query, _tables, _2) {
   "use strict";
+
+  var _state2 = _interopRequireDefault(_state);
 
   var actions = _interopRequireWildcard(_actions);
 
@@ -187,12 +195,6 @@
   var _tables2 = _interopRequireDefault(_tables);
 
   var _3 = _interopRequireDefault(_2);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
 
   function _interopRequireWildcard(obj) {
     if (obj && obj.__esModule) {
@@ -211,36 +213,13 @@
     }
   }
 
-  const pages = {
-    query: _query2.default,
-    tables: _tables2.default
-  };
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
 
-  const queryHistory = () => {
-    const qh = localStorage.getItem("queryHistory");
-    if (!qh) return [];
-    return JSON.parse(qh) || [];
-  };
-
-  const state = {
-    page: "query",
-    loading: 0,
-    databases: [],
-    selectedDatabase: localStorage.getItem("selectedDatabase") || null,
-    query: "",
-    queryFilterString: "",
-    queryFilterColumn: 0,
-    queryCurrent: 1,
-    queryChunkSize: 50,
-    queryHistory: queryHistory(),
-    queryResult: null,
-    queryStatus: "NOT_ASKED",
-    tables: {},
-    error: null
-  };
-
-  (0, _hyperapp.app)(state, actions, (state, actions) => {
-    const Page = pages[state.page] || _3.default;
+  const main = (0, _hyperapp.app)(_state2.default, actions, (state, actions) => {
     return (0, _hyperapp.h)(
       "main",
       {
@@ -255,10 +234,24 @@
       (0, _hyperapp.h)(
         "div",
         { className: "content" },
-        (0, _hyperapp.h)(Page, { state: state, actions: actions })
+        (0, _hyperapp.h)(
+          _router.Switch,
+          null,
+          (0, _hyperapp.h)(_router.Route, {
+            path: "/tables",
+            render: () => (0, _hyperapp.h)(_tables2.default, { state: state, actions: actions })
+          }),
+          (0, _hyperapp.h)(_router.Route, {
+            path: "/",
+            render: () => (0, _hyperapp.h)(_query2.default, { state: state, actions: actions })
+          }),
+          (0, _hyperapp.h)(_router.Route, { render: _3.default })
+        )
       )
     );
   }, document.body);
+
+  _router.location.subscribe(main.location);
 
   const setupShortcuts = actions => {
     window.addEventListener("keydown", e => {
@@ -283,7 +276,7 @@
   };
 });
 
-},{"./actions":2,"./api":3,"./pages/404":5,"./pages/query":6,"./pages/tables":7,"./views/error":8,"./views/loading":9,"./views/navigation":10,"hyperapp":1}],5:[function(require,module,exports){
+},{"./actions":3,"./api":4,"./pages/404":6,"./pages/query":7,"./pages/tables":8,"./state":9,"./views/error":10,"./views/loading":11,"./views/navigation":12,"@hyperapp/router":1,"hyperapp":2}],6:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
@@ -311,7 +304,7 @@
   );
 });
 
-},{"hyperapp":1}],6:[function(require,module,exports){
+},{"hyperapp":2}],7:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp", "../api", "../views/queryResult"], factory);
@@ -421,7 +414,7 @@
   };
 });
 
-},{"../api":3,"../views/queryResult":12,"hyperapp":1}],7:[function(require,module,exports){
+},{"../api":4,"../views/queryResult":14,"hyperapp":2}],8:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp", "../api"], factory);
@@ -475,7 +468,7 @@
   };
 
   exports.default = ({ state, actions }) => {
-    const tableDescription = state.tables[state.selectedDatabase];
+    const tableDescription = state.tables[state.selectedDatabase] || DEFAULT_TABLE_DESCRIPTION;
 
     if (tableDescription.fetchingStatus === "NOT_ASKED") {
       fetchTables(state.selectedDatabase, actions);
@@ -594,8 +587,9 @@
     }
   };
 
+  const DEFAULT_TABLE_DESCRIPTION = { fetchingStatus: "LOADING" };
   const fetchTables = async (db, actions) => {
-    actions.updateTables({ db, tableDescription: { fetchingStatus: "LOADING" } });
+    actions.updateTables({ db, tableDescription: DEFAULT_TABLE_DESCRIPTION });
     actions.loading(1);
     try {
       const data = await api.getTables(db);
@@ -619,7 +613,51 @@
   };
 });
 
-},{"../api":3,"hyperapp":1}],8:[function(require,module,exports){
+},{"../api":4,"hyperapp":2}],9:[function(require,module,exports){
+(function (global, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(["exports"], factory);
+  } else if (typeof exports !== "undefined") {
+    factory(exports);
+  } else {
+    var mod = {
+      exports: {}
+    };
+    factory(mod.exports);
+    global.state = mod.exports;
+  }
+})(this, function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  const queryHistory = () => {
+    const qh = localStorage.getItem("queryHistory");
+    if (!qh) return [];
+    return JSON.parse(qh) || [];
+  };
+
+  exports.default = {
+    location: location.state,
+    page: "query",
+    loading: 0,
+    databases: [],
+    selectedDatabase: localStorage.getItem("selectedDatabase") || null,
+    query: "",
+    queryFilterString: "",
+    queryFilterColumn: 0,
+    queryCurrent: 1,
+    queryChunkSize: 50,
+    queryHistory: queryHistory(),
+    queryResult: null,
+    queryStatus: "NOT_ASKED",
+    tables: {},
+    error: null
+  };
+});
+
+},{}],10:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
@@ -646,7 +684,7 @@
   ) : null;
 });
 
-},{"hyperapp":1}],9:[function(require,module,exports){
+},{"hyperapp":2}],11:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
@@ -673,20 +711,20 @@
   );
 });
 
-},{"hyperapp":1}],10:[function(require,module,exports){
+},{"hyperapp":2}],12:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "hyperapp"], factory);
+    define(["exports", "hyperapp", "@hyperapp/router"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("hyperapp"));
+    factory(exports, require("hyperapp"), require("@hyperapp/router"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.hyperapp);
+    factory(mod.exports, global.hyperapp, global.router);
     global.navigation = mod.exports;
   }
-})(this, function (exports, _hyperapp) {
+})(this, function (exports, _hyperapp, _router) {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
@@ -710,33 +748,24 @@
       ))
     ),
     (0, _hyperapp.h)(
-      "a",
-      {
-        href: "/query",
-        className: `${state.page === "query" ? "current" : ""}`,
-        onclick: e => {
-          e.preventDefault();
-          actions.changePage("query");
-        }
-      },
+      _router.Link,
+      { to: "/", className: getCurrent("/") },
       "Query"
     ),
     (0, _hyperapp.h)(
-      "a",
-      {
-        href: "/tables",
-        className: `${state.page === "tables" ? "current" : ""}`,
-        onclick: e => {
-          e.preventDefault();
-          actions.changePage("tables");
-        }
-      },
+      _router.Link,
+      { to: "/tables", className: getCurrent("/tables") },
       "Tables"
     )
   );
+
+  const getCurrent = loc => {
+    if (!window.location.pathname && loc === "/") return "current";
+    return window.location.pathname === loc ? "current" : "";
+  };
 });
 
-},{"hyperapp":1}],11:[function(require,module,exports){
+},{"@hyperapp/router":1,"hyperapp":2}],13:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp"], factory);
@@ -841,7 +870,7 @@
   );
 });
 
-},{"hyperapp":1}],12:[function(require,module,exports){
+},{"hyperapp":2}],14:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "hyperapp", "./paginator"], factory);
@@ -950,4 +979,4 @@
   const filterRow = (row, strs, colIdx) => strs.toLowerCase().split(" ").every(str => row[colIdx] && row[colIdx].toLowerCase().includes(str));
 });
 
-},{"./paginator":11,"hyperapp":1}]},{},[4]);
+},{"./paginator":13,"hyperapp":2}]},{},[5]);

@@ -2,7 +2,8 @@ import { h } from "hyperapp"
 import * as api from "../api"
 
 export default ({ state, actions }) => {
-  const tableDescription = state.tables[state.selectedDatabase]
+  const tableDescription =
+    state.tables[state.selectedDatabase] || DEFAULT_TABLE_DESCRIPTION
 
   if (tableDescription.fetchingStatus === "NOT_ASKED") {
     fetchTables(state.selectedDatabase, actions)
@@ -71,8 +72,9 @@ const Tables = ({ db, tableDescription, actions }) => {
   }
 }
 
+const DEFAULT_TABLE_DESCRIPTION = { fetchingStatus: "LOADING" }
 const fetchTables = async (db, actions) => {
-  actions.updateTables({ db, tableDescription: { fetchingStatus: "LOADING" } })
+  actions.updateTables({ db, tableDescription: DEFAULT_TABLE_DESCRIPTION })
   actions.loading(1)
   try {
     const data = await api.getTables(db)

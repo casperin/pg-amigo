@@ -1,4 +1,5 @@
 import { h } from "hyperapp"
+import { Link } from "@hyperapp/router"
 
 export default ({ state, actions }) => (
   <div className="navigation">
@@ -14,26 +15,17 @@ export default ({ state, actions }) => (
       ))}
     </select>
 
-    <a
-      href="/query"
-      className={`${state.page === "query" ? "current" : ""}`}
-      onclick={e => {
-        e.preventDefault()
-        actions.changePage("query")
-      }}
-    >
+    <Link to="/" className={getCurrent("/")}>
       Query
-    </a>
+    </Link>
 
-    <a
-      href="/tables"
-      className={`${state.page === "tables" ? "current" : ""}`}
-      onclick={e => {
-        e.preventDefault()
-        actions.changePage("tables")
-      }}
-    >
+    <Link to="/tables" className={getCurrent("/tables")}>
       Tables
-    </a>
+    </Link>
   </div>
 )
+
+const getCurrent = loc => {
+  if (!window.location.pathname && loc === "/") return "current"
+  return window.location.pathname === loc ? "current" : ""
+}

@@ -1,3 +1,7 @@
+import { location as routerLocation } from "@hyperapp/router"
+
+export const location = routerLocation.actions
+
 export const loading = n => state => ({
   loading: Math.max(0, state.loading + n)
 })
