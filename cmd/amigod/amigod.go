@@ -36,7 +36,7 @@ func main() {
 	})
 
 	r.Route("/api", func(r chi.Router) {
-		r.Use(middleware.MustBeLoggedIn)
+		r.Use(middleware.MustBeLoggedInApi)
 		r.Get("/database-server", api.DatabaseServer)
 		r.Get("/query/{db}", api.Query)
 		r.Get("/tables/{db}", api.Tables)

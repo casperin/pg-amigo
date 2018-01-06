@@ -2,21 +2,20 @@ import { h } from "hyperapp"
 import * as api from "../api"
 
 export default ({ state, actions }) => {
-  const tableDescription = state.tables[state.selectedDatabase]
+  const tableDescription = state.tables[state.selectedDatabase] || {
+    fetchingStatus: "NOT_ASKED"
+  }
 
   if (tableDescription.fetchingStatus === "NOT_ASKED") {
     fetchTables(state.selectedDatabase, actions)
   }
 
   return (
-    <div>
-      <h1>Tableoeuoteuh: {state.selectedDatabase}</h1>
-      <Tables
-        db={state.selectedDatabase}
-        tableDescription={tableDescription}
-        actions={actions}
-      />
-    </div>
+    <Tables
+      db={state.selectedDatabase}
+      tableDescription={tableDescription}
+      actions={actions}
+    />
   )
 }
 
@@ -33,18 +32,23 @@ const Tables = ({ db, tableDescription, actions }) => {
         <div>
           {Object.entries(tableDescription.tables).map(([tableName, desc]) => (
             <div>
-              <h4>
-                {tableName} ({desc.columns.length} columns)
+              <h2>
+                {tableName}
+                &nbsp;
+                <small style={{ fontWeight: 400 }}>
+                  ({desc.columns.length} columns)
+                </small>
+                &nbsp;
                 <button
                   onclick={e => actions.toggleShowTable({ db, tableName })}
                 >
                   {desc.open ? "Close" : "Open"}
                 </button>
-              </h4>
+              </h2>
               {desc.open && (
                 <table>
                   <thead>
-                    <tr>
+                    <tr class="labels">
                       <td>Name</td>
                       <td>isNullable</td>
                       <td>Data Type</td>
@@ -71,7 +75,7 @@ const Tables = ({ db, tableDescription, actions }) => {
       )
 
     case "FAILURE":
-      return <pre className="display-error">{tableDescription.error}</pre>
+      return <pre class="display-error">{tableDescription.error}</pre>
   }
 }
 

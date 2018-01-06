@@ -1,3 +1,7 @@
+import { location as routerLocation } from "@hyperapp/router"
+
+export const location = routerLocation.actions
+
 export const loading = n => state => ({
   loading: Math.max(0, state.loading + n)
 })
@@ -31,6 +35,8 @@ export const selectDatabase = selectedDatabase => state => {
 
 export const updateQuery = query => state => ({ query })
 
+export const onTruncateChange = queryTruncate => state => ({ queryTruncate })
+
 export const onQueryFilterStringChange = queryFilterString => state => ({
   queryFilterString,
   queryCurrent: 1
@@ -43,7 +49,10 @@ export const onQueryFilterColumnChange = queryFilterColumn => state => ({
 
 export const updateQueryStatus = queryStatus => state => ({ queryStatus })
 
-export const updateQueryResult = queryResult => state => ({ queryResult })
+export const updateQueryResult = queryResult => state => ({
+  queryResult,
+  queryCurrent: 1
+})
 
 export const addQueryToHistory = query => state => {
   const queryHistory = [

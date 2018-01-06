@@ -1,4 +1,6 @@
 import { h, app } from "hyperapp"
+import { Switch, Route, location } from "@hyperapp/router"
+import state from "./state"
 import * as actions from "./actions"
 import * as api from "./api"
 import Loading from "./views/loading"
@@ -8,39 +10,10 @@ import Query from "./pages/query"
 import Tables from "./pages/tables"
 import NotFound from "./pages/404"
 
-const pages = {
-  query: Query,
-  tables: Tables
-}
-
-const queryHistory = () => {
-  const qh = localStorage.getItem("queryHistory")
-  if (!qh) return []
-  return JSON.parse(qh) || []
-}
-
-const state = {
-  page: "query",
-  loading: 0,
-  databases: [],
-  selectedDatabase: localStorage.getItem("selectedDatabase") || null,
-  query: "",
-  queryFilterString: "",
-  queryFilterColumn: 0,
-  queryCurrent: 1,
-  queryChunkSize: 50,
-  queryHistory: queryHistory(),
-  queryResult: null,
-  queryStatus: "NOT_ASKED",
-  tables: {},
-  error: null
-}
-
-app({
+const main = app(
   state,
   actions,
-  view: state => actions => {
-    const Page = pages[state.page] || NotFound
+  (state, actions) => {
     return (
       <main
         oncreate={() => {
@@ -51,13 +24,26 @@ app({
         <ErrorView error={state.error} />
         <Loading count={state.loading} />
         <Navigation state={state} actions={actions} />
-        <div className="content">
-          <Page state={state} actions={actions} />
+        <div class="content">
+          <Switch>
+            <Route
+              path="/tables"
+              render={() => <Tables state={state} actions={actions} />}
+            />
+            <Route
+              path="/"
+              render={() => <Query state={state} actions={actions} />}
+            />
+            <Route render={NotFound} />
+          </Switch>
         </div>
       </main>
     )
-  }
-})
+  },
+  document.body
+)
+
+location.subscribe(main.location)
 
 const setupShortcuts = actions => {
   window.addEventListener("keydown", e => {

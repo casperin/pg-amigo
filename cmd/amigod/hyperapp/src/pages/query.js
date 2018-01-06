@@ -1,20 +1,21 @@
 import { h } from "hyperapp"
 import * as api from "../api"
+import Textarea from "../views/textarea"
 import QueryResult from "../views/queryResult"
 
 export default ({ state, actions }) => {
   return (
     <div>
-      <div className="query-container">
-        <div className="query-textarea-container">
-          <textarea
+      <div class="query-container">
+        <div class="query-textarea-container">
+          <Textarea
             oncreate={el => el.focus()}
             value={state.query}
             oninput={e => actions.updateQuery(e.target.value)}
           />
         </div>
 
-        <div className="query-controls">
+        <div class="query-controls">
           <button
             onclick={() =>
               runQuery(state.selectedDatabase, state.query, actions)
@@ -24,7 +25,7 @@ export default ({ state, actions }) => {
             Run
           </button>
           <select
-            className="history-select"
+            class="history-select"
             onchange={e => actions.updateQuery(e.target.value)}
           >
             <option value="">Previous queries</option>

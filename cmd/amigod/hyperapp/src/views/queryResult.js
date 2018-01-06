@@ -13,9 +13,7 @@ export default props => {
       return <QuerySuccess {...props} />
 
     case "FAILURE":
-      return (
-        <pre className="display-error">{props.state.queryResult.error}</pre>
-      )
+      return <pre class="display-error">{props.state.queryResult.error}</pre>
 
     default:
       return null
@@ -30,22 +28,24 @@ const QuerySuccess = ({ state, actions }) => {
     : state.queryResult.values
 
   return (
-    <div className="query-result-container">
+    <div class="query-result-container">
       <Paginator
         onPageChange={actions.updateQueryPage}
         current={state.queryCurrent}
         total={Math.ceil(values.length / state.queryChunkSize)}
         queryChunkSize={state.queryChunkSize}
         onChunkSizeChange={actions.updateChunkSize}
+        queryTruncate={state.queryTruncate}
+        onTruncateChange={actions.onTruncateChange}
         queryFilterString={state.queryFilterString}
         queryFilterColumn={state.queryFilterColumn}
         columnNames={state.queryResult.schema.map(col => col.name)}
         onQueryFilterStringChange={actions.onQueryFilterStringChange}
         onQueryFilterColumnChange={actions.onQueryFilterColumnChange}
       />
-      <table className="query-table">
+      <table class="query-table">
         <thead>
-          <tr className="labels">
+          <tr class="labels">
             {state.queryResult.schema.map(col => (
               <td key={col.name}>{col.name}</td>
             ))}
@@ -60,7 +60,9 @@ const QuerySuccess = ({ state, actions }) => {
             )
             .map((row, i) => (
               <tr key={i}>
-                {row.map((col, i) => <td key={i}>{col.substr(0, 200)}</td>)}
+                {row.map((col, i) => (
+                  <td key={i}>{truncate(col, state.queryTruncate)}</td>
+                ))}
               </tr>
             ))}
         </tbody>
@@ -74,3 +76,8 @@ const filterRow = (row, strs, colIdx) =>
     .toLowerCase()
     .split(" ")
     .every(str => row[colIdx] && row[colIdx].toLowerCase().includes(str))
+
+const truncate = (str, len) => {
+  if (len === -1 || str.length < len - 3) return str
+  return str.substr(0, len) + "…"
+}

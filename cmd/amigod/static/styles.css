@@ -16,7 +16,7 @@ table {
     min-width: 100%;
 }
 
-table.query-table thead td {
+table thead td {
     border: none;
     position: -webkit-sticky;
     position: sticky;
@@ -94,7 +94,6 @@ td {
 
 .query-container textarea {
     align-self: stretch;
-    min-height: 50px;
     margin-bottom: 5px;
     padding: 5px;
 }
@@ -129,6 +128,14 @@ td {
 }
 
 .paginator .paginator__chunks span {
+    margin-right: 5px;
+}
+
+.paginator .paginator__truncate {
+    margin-left: 10px;
+}
+
+.paginator .paginator__truncate span {
     margin-right: 5px;
 }
 
