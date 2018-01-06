@@ -410,7 +410,7 @@
 
   const runQuery = (db, query, actions) => {
     actions.updateQueryStatus("LOADING");
-    api.runQuery(db, query).then(data => {
+    api.runQuery(db, query.replace(/\n/g, " ")).then(data => {
       actions.updateQueryResult(data);
       actions.updateQueryStatus(data.error ? "FAILURE" : "SUCCESS");
       actions.addQueryToHistory(query);
