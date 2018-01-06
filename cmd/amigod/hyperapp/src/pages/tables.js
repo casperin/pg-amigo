@@ -47,7 +47,9 @@ const Tables = ({ db, tableDescription, actions }) => {
                     <tr>
                       <td>Name</td>
                       <td>isNullable</td>
-                      <td>UDT Name</td>
+                      <td>Data Type</td>
+                      <td>Default Value</td>
+                      <td>PK</td>
                     </tr>
                   </thead>
                   <tbody>
@@ -55,7 +57,9 @@ const Tables = ({ db, tableDescription, actions }) => {
                       <tr>
                         <td>{row.columnName}</td>
                         <td>{row.isNullable}</td>
-                        <td>{row.udtName}</td>
+                        <td>{row.dataType + (row.characterMaximumLength.valid ? ` (${row.characterMaximumLength.value})`: '')}</td>
+                        <td>{row.columnDefault.valid ? row.columnDefault.value : 'NULL'}</td>
+                        <td>{row.primaryKey.valid ? '✓ '  : ' '}</td>
                       </tr>
                     ))}
                   </tbody>

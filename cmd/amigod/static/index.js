@@ -558,7 +558,17 @@
                   (0, _hyperapp.h)(
                     "td",
                     null,
-                    "UDT Name"
+                    "Data Type"
+                  ),
+                  (0, _hyperapp.h)(
+                    "td",
+                    null,
+                    "Default Value"
+                  ),
+                  (0, _hyperapp.h)(
+                    "td",
+                    null,
+                    "PK"
                   )
                 )
               ),
@@ -581,7 +591,17 @@
                   (0, _hyperapp.h)(
                     "td",
                     null,
-                    row.udtName
+                    row.dataType + (row.characterMaximumLength.valid ? ` (${row.characterMaximumLength.value})` : '')
+                  ),
+                  (0, _hyperapp.h)(
+                    "td",
+                    null,
+                    row.columnDefault.valid ? row.columnDefault.value : 'NULL'
+                  ),
+                  (0, _hyperapp.h)(
+                    "td",
+                    null,
+                    row.primaryKey.valid ? '✓ ' : ' '
                   )
                 ))
               )

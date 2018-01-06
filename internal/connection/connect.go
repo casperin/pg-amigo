@@ -83,3 +83,23 @@ func (c *Conn) Query(cmd string, args ...interface{}) (*sql.Rows, error) {
 	defer db.Close()
 	return db.Query(cmd, args...)
 }
+
+// Type to retrieve nullable values from the database
+// it's the same as sql.NullString but the json rendering
+// is diferent.
+type nullString struct {
+	String string `json:"value"`
+	Valid  bool   `json:"valid"`
+}
+
+func (ns *nullString) Scan(value interface{}) error {
+	sqlNullString := &sql.NullString{}
+	err := sqlNullString.Scan(value)
+	if err != nil {
+		return err
+	}
+
+	ns.String = sqlNullString.String
+	ns.Valid = sqlNullString.Valid
+	return nil
+}

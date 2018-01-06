@@ -1,17 +1,18 @@
 package connection
 
 import (
-	"database/sql"
-
 	"github.com/pkg/errors"
 )
 
 type TableColumn struct {
-	TableName     string         `db:"table_name" json:"tableName"`
-	ColumnName    string         `db:"column_name" json:"columnName"`
-	IsNullable    string         `db:"is_nullable" json:"isNullable"`
-	ColumnDefault sql.NullString `db:"column_default" json:"columnDefault"`
-	UdtName       string         `db:"udt_name" json:"udtName"`
+	TableName              string     `db:"table_name" json:"tableName"`
+	ColumnName             string     `db:"column_name" json:"columnName"`
+	IsNullable             string     `db:"is_nullable" json:"isNullable"`
+	ColumnDefault          nullString `db:"column_default" json:"columnDefault"`
+	UdtName                string     `db:"udt_name" json:"udtName"`
+	DataType               string     `db:"data_type" json:"dataType"`
+	CharacterMaximumLength nullString `db:"character_maximum_length" json:"characterMaximumLength"`
+	PrimaryKey             nullString `db:"constraint_type" json:"primaryKey"`
 }
 
 type Tables map[string][]*TableColumn
@@ -21,12 +22,21 @@ func GetTablesOverview(c Selecter, dbName string) (Tables, error) {
 	err := c.Select(
 		&columns,
 		// There is a *lot* more that can be asked for here
-		`SELECT table_name, column_name, is_nullable, column_default, udt_name
-		FROM information_schema.columns
-		WHERE table_catalog = $1
-		AND table_name != 'pg_proc'
-		AND table_schema != 'pg_catalog'
-		AND table_schema != 'information_schema'`,
+		`SELECT distinct on (c.table_name, c.column_name) 
+		c.table_name, c.column_name, c.is_nullable, 
+		c.column_default, c.udt_name, c.data_type, c.character_maximum_length, tc.constraint_type
+		
+		FROM information_schema.columns c
+
+		LEFT JOIN information_schema.constraint_column_usage ccu ON ccu.column_name = c.column_name AND ccu.table_name = c.table_name 
+		LEFT JOIN information_schema.table_constraints tc 
+		ON tc.constraint_schema = ccu.constraint_schema AND ccu.constraint_name = tc.constraint_name
+
+		WHERE c.table_catalog = $1
+		AND c.table_name != 'pg_proc'
+		AND c.table_schema != 'pg_catalog'
+		AND c.table_schema != 'information_schema'
+		AND (tc.constraint_type='PRIMARY KEY' or tc.constraint_type is NULL)`,
 		dbName,
 	)
 	if err != nil {
@@ -39,6 +49,7 @@ func GetTablesOverview(c Selecter, dbName string) (Tables, error) {
 		}
 		tables[c.TableName] = append(tables[c.TableName], c)
 	}
+
 	return tables, nil
 }
 
