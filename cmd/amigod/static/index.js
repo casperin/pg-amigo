@@ -158,7 +158,7 @@
     credentials: "include"
   };
 
-  const get = (url, opt) => fetch(url, _extends({}, fetchOptions, opt)).then(res => res.json()).then(resp => resp.data);
+  const get = (url, opt) => fetch(url, _extends({}, fetchOptions, opt)).then(res => res.json()).then(resp => resp.error ? resp : resp.data);
 
   const getDatabaseServer = exports.getDatabaseServer = () => get("/api/database-server");
 

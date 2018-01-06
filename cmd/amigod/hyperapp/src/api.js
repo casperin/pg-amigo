@@ -10,7 +10,7 @@ const fetchOptions = {
 const get = (url, opt) =>
   fetch(url, { ...fetchOptions, ...opt })
     .then(res => res.json())
-    .then(resp => resp.data)
+    .then(resp => (resp.error ? resp : resp.data))
 
 export const getDatabaseServer = () => get("/api/database-server")
 
