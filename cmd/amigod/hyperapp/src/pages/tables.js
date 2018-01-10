@@ -1,5 +1,5 @@
 import { h } from "hyperapp"
-import { Link } from "@hyperapp/router"
+import { Link, location } from "@hyperapp/router"
 import * as api from "../api"
 
 export default ({ state, actions }) => {
@@ -44,10 +44,14 @@ const Tables = ({ db, tableDescription, actions }) => {
                   onclick={e => actions.toggleShowTable({ db, tableName })}
                 >
                   {desc.open ? "Hide" : "Show"}
+                </button>{" "}
+                <button
+                  onclick={() =>
+                    location.actions.go(`/tables/${tableName}/alter`)
+                  }
+                >
+                  Alter
                 </button>
-                <small style={{ marginLeft: "5px" }}>
-                  <Link to={`/tables/${tableName}/alter`}>Alter</Link>
-                </small>
               </h2>
               {desc.open && (
                 <table>
@@ -73,9 +77,11 @@ const Tables = ({ db, tableDescription, actions }) => {
                               : "")}
                         </td>
                         <td>
-                          {row.columnDefault.valid
-                            ? row.columnDefault.value
-                            : "NULL"}
+                          {row.columnDefault.valid ? (
+                            row.columnDefault.value
+                          ) : (
+                            <i>NULL</i>
+                          )}
                         </td>
                         <td>{row.primaryKey.valid ? "✓ " : " "}</td>
                         <td>{row.foreignKey}</td>

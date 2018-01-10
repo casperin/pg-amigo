@@ -22,7 +22,7 @@ const main = app(
           fetchDatabases(actions)
         }}
       >
-        <ErrorView error={state.error} />
+        <ErrorView error={state.error} clearError={actions.clearError} />
         <Loading count={state.loading} />
         <Navigation state={state} actions={actions} />
         <div class="content">

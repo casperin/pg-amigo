@@ -7,7 +7,7 @@ const fetchOptions = {
   credentials: "include"
 }
 
-const throwIfErrorInData = data => {
+export const throwIfErrorInData = data => {
   if (data.error) throw new Error(data.error)
   return data
 }
@@ -22,4 +22,3 @@ export const getDatabaseServer = () => get("/api/database-server")
 export const runQuery = (db, query) => get("/api/query/" + db + "?q=" + query)
 
 export const getTables = db => get("/api/tables/" + db)
-

@@ -8,6 +8,8 @@ export const loading = n => state => ({
 
 export const handleError = error => state => ({ error: error.message })
 
+export const clearError = () => state => ({ error: null })
+
 export const changePage = page => state => {
   return page === "query"
     ? { page, queryFilterString: "", queryFilterColumn: 0 }
@@ -90,7 +92,10 @@ export const toggleShowTable = ({ db, tableName }) => state => ({
   }
 })
 
-export const renameTable = renameTable => state => ({
+export const renameTable = ({ db, oldName, newName }) => state => ({
   ...state,
-  renameTable
+  renameTable: {
+    ...state.renameTable,
+    [`${db}.${oldName}`]: newName
+  }
 })

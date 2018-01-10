@@ -41,6 +41,11 @@ td {
     padding: .5em;
     background: #a00;
     color: #fdd;
+    display: flex;
+}
+
+.error .error-message {
+    flex: 1
 }
 
 .display-error {

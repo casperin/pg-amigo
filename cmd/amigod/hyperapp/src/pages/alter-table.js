@@ -9,18 +9,28 @@ export default ({ state, actions, tableName }) => (
       <dt>Rename table</dt>
       <dd>
         <input
-          value={state.renameTable}
-          oninput={e => actions.renameTable(e.target.value)}
+          value={
+            state.renameTable[`${state.selectedDatabase}.${tableName}`] || ""
+          }
+          oninput={e =>
+            actions.renameTable({
+              db: state.selectedDatabase,
+              oldName: tableName,
+              newName: e.target.value
+            })
+          }
           autofocus
           placeholder={tableName}
         />{" "}
         <button
-          disabled={!state.renameTable}
+          disabled={
+            !state.renameTable[`${state.selectedDatabase}.${tableName}`]
+          }
           onclick={() =>
             renameTable(
               state.selectedDatabase,
               tableName,
-              state.renameTable,
+              state.renameTable[`${state.selectedDatabase}.${tableName}`],
               actions
             )
           }
@@ -38,6 +48,7 @@ const renameTable = (db, oldName, newName, actions) => {
   api
     .runQuery(db, query)
     .then(api.throwIfErrorInData)
+    .then(_ => actions.renameTable({db, oldName, newName: ""}))
     .then(api.getDatabaseServer)
     .then(data => actions.updateDatabases(data.databases))
     .then(_ => location.actions.go("/tables"))
