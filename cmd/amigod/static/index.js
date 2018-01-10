@@ -990,6 +990,7 @@
 
   const QuerySuccess = ({ state, actions }) => {
     const values = state.queryFilterString.trim() ? state.queryResult.values.filter(row => filterRow(row, state.queryFilterString, state.queryFilterColumn)) : state.queryResult.values;
+    const totalPages = Math.ceil(values.length / state.queryChunkSize) || 1;
 
     return (0, _hyperapp.h)(
       "div",
@@ -997,7 +998,7 @@
       (0, _hyperapp.h)(_paginator2.default, {
         onPageChange: actions.updateQueryPage,
         current: state.queryCurrent,
-        total: Math.ceil(values.length / state.queryChunkSize),
+        total: totalPages,
         queryChunkSize: state.queryChunkSize,
         onChunkSizeChange: actions.updateChunkSize,
         queryTruncate: state.queryTruncate,
