@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	pgHost     string = viper.GetString("pg_host")
 	pgUsername string = viper.GetString("pg_username")
 	pgPassword string = viper.GetString("pg_password")
 )
@@ -36,13 +37,15 @@ func (c *Conn) connect() (*sqlx.DB, error) {
 func connectionString(dbName string) string {
 	if dbName == "" {
 		return fmt.Sprintf(
-			"user=%s password=%s sslmode=disable",
+			"host=%s user=%s password=%s sslmode=disable",
+			pgHost,
 			pgUsername,
 			pgPassword,
 		)
 	}
 	return fmt.Sprintf(
-		"user=%s password=%s dbname=%s sslmode=disable",
+		"host=%s user=%s password=%s dbname=%s sslmode=disable",
+		pgHost,
 		pgUsername,
 		pgPassword,
 		dbName,
