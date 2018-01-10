@@ -58,6 +58,7 @@ const Tables = ({ db, tableDescription, actions }) => {
                       <td>Data Type</td>
                       <td>Default Value</td>
                       <td>PK</td>
+                      <td>FK</td>
                     </tr>
                   </thead>
                   <tbody>
@@ -77,6 +78,7 @@ const Tables = ({ db, tableDescription, actions }) => {
                             : "NULL"}
                         </td>
                         <td>{row.primaryKey.valid ? "✓ " : " "}</td>
+                        <td>{row.foreignKey}</td>
                       </tr>
                     ))}
                   </tbody>

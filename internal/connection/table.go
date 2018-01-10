@@ -13,16 +13,25 @@ type TableColumn struct {
 	DataType               string     `db:"data_type" json:"dataType"`
 	CharacterMaximumLength nullString `db:"character_maximum_length" json:"characterMaximumLength"`
 	PrimaryKey             nullString `db:"constraint_type" json:"primaryKey"`
+	ForeignKey             string     `json:"foreignKey"`
 }
 
 type Tables map[string][]*TableColumn
+
+type ForeignKey struct {
+	ConstraintName    string `db:"constraint_name"`
+	TableName         string `db:"table_name"`
+	ColumnName        string `db:"column_name"`
+	ForeignTableName  string `db:"foreign_table_name"`
+	ForeignColumnName string `db:"foreign_column_name"`
+}
 
 func GetTablesOverview(c Selecter, dbName string) (Tables, error) {
 	var columns []*TableColumn
 	err := c.Select(
 		&columns,
 		// There is a *lot* more that can be asked for here
-		`SELECT distinct on (c.table_name, c.column_name) 
+		`SELECT 
 		c.table_name, c.column_name, c.is_nullable, 
 		c.column_default, c.udt_name, c.data_type, c.character_maximum_length, tc.constraint_type
 		
@@ -42,10 +51,37 @@ func GetTablesOverview(c Selecter, dbName string) (Tables, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not get table information for db: "+dbName)
 	}
+
+	var foreignKeys []*ForeignKey
+	err = c.Select(
+		&foreignKeys,
+		`SELECT
+				tc.constraint_name, tc.table_name, kcu.column_name, 
+				ccu.table_name AS foreign_table_name,
+				ccu.column_name AS foreign_column_name 
+		FROM 
+				information_schema.table_constraints AS tc 
+				JOIN information_schema.key_column_usage AS kcu
+					ON tc.constraint_name = kcu.constraint_name
+				JOIN information_schema.constraint_column_usage AS ccu
+					ON ccu.constraint_name = tc.constraint_name
+		WHERE constraint_type = 'FOREIGN KEY'`,
+	)
+
+	foreignKeysMap := map[string]*ForeignKey{}
+	for _, fk := range foreignKeys {
+		foreignKeysMap[fk.TableName+"."+fk.ColumnName] = fk
+	}
+
 	tables := Tables{}
 	for _, c := range columns {
 		if tables[c.TableName] == nil {
 			tables[c.TableName] = []*TableColumn{}
+		}
+
+		fk := foreignKeysMap[c.TableName+"."+c.ColumnName]
+		if fk != nil {
+			c.ForeignKey = "REFERENCES " + fk.ForeignTableName + "(" + fk.ForeignColumnName + ")"
 		}
 		tables[c.TableName] = append(tables[c.TableName], c)
 	}
