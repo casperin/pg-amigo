@@ -89,3 +89,8 @@ export const toggleShowTable = ({ db, tableName }) => state => ({
     }
   }
 })
+
+export const renameTable = renameTable => state => ({
+  ...state,
+  renameTable
+})

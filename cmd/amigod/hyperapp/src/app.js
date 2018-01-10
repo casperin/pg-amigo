@@ -8,6 +8,7 @@ import ErrorView from "./views/error"
 import Navigation from "./views/navigation"
 import Query from "./pages/query"
 import Tables from "./pages/tables"
+import AlterTable from "./pages/alter-table"
 import NotFound from "./pages/404"
 
 const main = app(
@@ -29,6 +30,16 @@ const main = app(
             <Route
               path="/tables"
               render={() => <Tables state={state} actions={actions} />}
+            />
+            <Route
+              path="/tables/:table/alter"
+              render={props => (
+                <AlterTable
+                  state={state}
+                  actions={actions}
+                  tableName={props.match.params.table}
+                />
+              )}
             />
             <Route
               path="/"

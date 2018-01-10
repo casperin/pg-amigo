@@ -1,4 +1,5 @@
 import { h } from "hyperapp"
+import { Link } from "@hyperapp/router"
 import * as api from "../api"
 
 export default ({ state, actions }) => {
@@ -42,8 +43,11 @@ const Tables = ({ db, tableDescription, actions }) => {
                 <button
                   onclick={e => actions.toggleShowTable({ db, tableName })}
                 >
-                  {desc.open ? "Close" : "Open"}
+                  {desc.open ? "Hide" : "Show"}
                 </button>
+                <small style={{ marginLeft: "5px" }}>
+                  <Link to={`/tables/${tableName}/alter`}>Alter</Link>
+                </small>
               </h2>
               {desc.open && (
                 <table>
@@ -61,9 +65,18 @@ const Tables = ({ db, tableDescription, actions }) => {
                       <tr>
                         <td>{row.columnName}</td>
                         <td>{row.isNullable}</td>
-                        <td>{row.dataType + (row.characterMaximumLength.valid ? ` (${row.characterMaximumLength.value})`: '')}</td>
-                        <td>{row.columnDefault.valid ? row.columnDefault.value : 'NULL'}</td>
-                        <td>{row.primaryKey.valid ? '✓ '  : ' '}</td>
+                        <td>
+                          {row.dataType +
+                            (row.characterMaximumLength.valid
+                              ? ` (${row.characterMaximumLength.value})`
+                              : "")}
+                        </td>
+                        <td>
+                          {row.columnDefault.valid
+                            ? row.columnDefault.value
+                            : "NULL"}
+                        </td>
+                        <td>{row.primaryKey.valid ? "✓ " : " "}</td>
                       </tr>
                     ))}
                   </tbody>

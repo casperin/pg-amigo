@@ -20,5 +20,6 @@ export default {
   queryResult: null,
   queryStatus: "NOT_ASKED",
   tables: {},
+  renameTable: "",
   error: null
 }
