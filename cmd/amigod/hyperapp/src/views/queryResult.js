@@ -26,13 +26,14 @@ const QuerySuccess = ({ state, actions }) => {
         filterRow(row, state.queryFilterString, state.queryFilterColumn)
       )
     : state.queryResult.values
+  const totalPages = Math.ceil(values.length / state.queryChunkSize) || 1
 
   return (
     <div class="query-result-container">
       <Paginator
         onPageChange={actions.updateQueryPage}
         current={state.queryCurrent}
-        total={Math.ceil(values.length / state.queryChunkSize)}
+        total={totalPages}
         queryChunkSize={state.queryChunkSize}
         onChunkSizeChange={actions.updateChunkSize}
         queryTruncate={state.queryTruncate}
