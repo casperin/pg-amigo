@@ -1,5 +1,7 @@
 node_modules/
 
+cmd/amigod/static/index.js
+
 config.json
 
 npm-debug.log
