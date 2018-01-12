@@ -22,6 +22,10 @@ export default ({ state, actions }) => (
     <Link to="/tables" class={getCurrent("/tables")}>
       Tables
     </Link>
+
+    <Link to="/export" class={getCurrent("/export")}>
+      Export
+    </Link>
   </div>
 )
 

@@ -40,6 +40,7 @@ func main() {
 		r.Get("/database-server", api.DatabaseServer)
 		r.Get("/query/{db}", api.Query)
 		r.Get("/tables/{db}", api.Tables)
+		r.Get("/dump/{db}", api.Dump)
 	})
 
 	port := viper.GetString("port")

@@ -48,7 +48,7 @@ const renameTable = (db, oldName, newName, actions) => {
   api
     .runQuery(db, query)
     .then(api.throwIfErrorInData)
-    .then(_ => actions.renameTable({db, oldName, newName: ""}))
+    .then(_ => actions.renameTable({ db, oldName, newName: "" }))
     .then(api.getDatabaseServer)
     .then(data => actions.updateDatabases(data.databases))
     .then(_ => location.actions.go("/tables"))

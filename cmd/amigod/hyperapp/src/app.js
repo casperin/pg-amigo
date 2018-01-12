@@ -8,6 +8,7 @@ import ErrorView from "./views/error"
 import Navigation from "./views/navigation"
 import Query from "./pages/query"
 import Tables from "./pages/tables"
+import Export from "./pages/export"
 import AlterTable from "./pages/alter-table"
 import NotFound from "./pages/404"
 
@@ -40,6 +41,10 @@ const main = app(
                   tableName={props.match.params.table}
                 />
               )}
+            />
+            <Route
+              path="/export"
+              render={props => <Export db={state.selectedDatabase} />}
             />
             <Route
               path="/"
