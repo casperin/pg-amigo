@@ -1,5 +1,5 @@
 import { h, app } from "hyperapp"
-import { Switch, Route, location } from "@hyperapp/router"
+import { Switch, Route, location, Redirect } from "@hyperapp/router"
 import state from "./state"
 import * as actions from "./actions"
 import * as api from "./api"
@@ -29,9 +29,15 @@ const main = app(
         <div class="content">
           <Switch>
             <Route
+              path="/query"
+              render={() => <Query state={state} actions={actions} />}
+            />
+
+            <Route
               path="/tables"
               render={() => <Tables state={state} actions={actions} />}
             />
+
             <Route
               path="/tables/:table/alter"
               render={props => (
@@ -42,13 +48,15 @@ const main = app(
                 />
               )}
             />
+
             <Route
               path="/export"
               render={props => <Export db={state.selectedDatabase} />}
             />
+
             <Route
               path="/"
-              render={() => <Query state={state} actions={actions} />}
+              render={() => <Redirect to="/query" />}
             />
             <Route render={NotFound} />
           </Switch>
