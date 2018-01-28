@@ -30,7 +30,10 @@ const main = app(
           <Switch>
             <Route
               path="/query"
-              render={() => <Query state={state} actions={actions} />}
+              render={() => {
+                console.log('query:', state.selectedDatabase)
+                return <Query state={state} actions={actions} />
+              }}
             />
 
             <Route
@@ -56,7 +59,13 @@ const main = app(
 
             <Route
               path="/"
-              render={() => <Redirect to="/query" />}
+              render={() => {
+                console.log(state.selectedDatabase)
+                if (state.selectedDatabase) {
+                  return <Redirect to="/query" />
+                }
+                return <p>Loading...</p>
+              }}
             />
             <Route render={NotFound} />
           </Switch>
