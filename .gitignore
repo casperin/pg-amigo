@@ -7,3 +7,5 @@ config.json
 npm-debug.log
 
 .vimrc
+
+elm-stuff/
